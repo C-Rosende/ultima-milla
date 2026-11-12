@@ -4,6 +4,8 @@
   const KEY = 'ultima-milla-demo-v1';
   const DEMO = new URLSearchParams(location.search).get('demo') === '1';
   const DIRECT = new URLSearchParams(location.search).get('pantalla');
+  const LUIS = globalThis.DATOS?.luis.cifras;
+  if (new URLSearchParams(location.search).get('embebido') === '1') document.body.classList.add('embedded');
   if (DIRECT === 'resumen' && new URLSearchParams(location.search).get('compacto') === '1') document.body.classList.add('compact-summary');
   const SCREENS = ['inicio', 'oferta', 'resumen', 'mapa', 'vehiculo'];
   const MONEY = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 });
@@ -42,7 +44,8 @@
       if (day === 0) {
         for (let i=0; i<19; i++) {
           const gross=i===18?4400:3200, fuel=i===18?560:480, totalMinutes=i===18?48:34;
-          jobs.push({id:`luis-${i}`,date:today(),time:`${String(9+Math.floor(i/2)).padStart(2,'0')}:${i%2?'30':'00'}`,platform:['Uber Eats','PedidosYa','Rappi'][i%3],restaurant:'Pedido entregado',from:'Santiago',to:'Entrega',status:'completed',gross,fuel,maintenance:0,data:0,cost:fuel,net:gross-fuel,totalMinutes,minutes:totalMinutes,waitMin:0,km:3.2,returnKm:.8,totalKm:4,signal:'green'});
+          const waitMin=Math.floor((i+1)*LUIS.espera_min/LUIS.pedidos)-Math.floor(i*LUIS.espera_min/LUIS.pedidos);
+          jobs.push({id:`luis-${i}`,date:today(),time:`${String(9+Math.floor(i/2)).padStart(2,'0')}:${i%2?'30':'00'}`,platform:['Uber Eats','PedidosYa','Rappi'][i%3],restaurant:'Pedido entregado',from:'Santiago',to:'Entrega',status:'completed',gross,fuel,maintenance:0,data:0,cost:fuel,net:gross-fuel,totalMinutes,minutes:totalMinutes-waitMin,waitMin,km:3.2,returnKm:.8,totalKm:4,signal:'green'});
         }
         continue;
       }
@@ -195,6 +198,14 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     if (main) main.scrollTop=changed?0:oldScroll;
     if (changed && lastScreen!==null) document.getElementById('page-title')?.focus({preventScroll:true});
     lastScreen=screen;
+    if (window.parent!==window && DIRECT==='resumen') {
+      const {gross,fuel,maintenance,data,net,waitMin}=aggregate(periodJobs());
+      window.parent.postMessage({tipo:'resumen-luis',gross,fuel,maintenance,data,net,waitMin},'*');
+    }
+    if (window.parent!==window && DIRECT==='oferta' && currentOffer) {
+      const {signal}=calculateOffer(currentOffer,vehicle(),state.settings);
+      window.parent.postMessage({tipo:'senal-oferta',signal},'*');
+    }
     animateCounts();
     updateTimer();
   }
