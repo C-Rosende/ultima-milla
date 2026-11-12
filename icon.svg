@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Última Milla">
+  <rect width="512" height="512" rx="112" fill="#10251e"/>
+  <path d="M112 340h118l92-168" fill="none" stroke="#c8f06c" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M258 172h64v64" fill="none" stroke="#c8f06c" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="112" cy="340" r="20" fill="#c8f06c"/>
+</svg>
