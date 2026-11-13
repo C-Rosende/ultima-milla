@@ -258,6 +258,13 @@ h2 { font-size: 17px; line-height: 1.25; font-weight: 700; letter-spacing: -.01e
 
 /* Semáforo */
 .offer-top { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
+.wait-insight { display: grid; gap: 7px; border-color: #bbd6cd; background: #f4faf7; }
+.wait-insight-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.wait-insight .kicker { margin-bottom: 4px; overflow-wrap: anywhere; }
+.wait-insight strong { display: block; font-size: clamp(30px, 9vw, 38px); line-height: 1.05; font-variant-numeric: tabular-nums; }
+.wait-insight strong small { font-size: 16px; font-weight: 650; }
+.wait-insight .ic { flex: none; width: 28px; height: 28px; color: var(--green); }
+.wait-insight > p { color: var(--ink-2); font-size: 13px; line-height: 1.4; }
 .tl {
   width: 40px; padding: 6px; border-radius: 14px;
   background: var(--forest);

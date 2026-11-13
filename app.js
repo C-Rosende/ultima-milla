@@ -155,14 +155,19 @@
   let toastTimer = null;
   let demoTimers = [];
   let lastScreen = null;
-  if (DIRECT) { state.onboarded = true; state.connected = ['Uber Eats','PedidosYa','Rappi']; if (DIRECT==='oferta') { currentOffer={...OFFERS[0]}; state.offerCursor=1; } }
+  if (DIRECT) { state.onboarded = true; state.connected = ['Uber Eats','PedidosYa','Rappi']; if (DIRECT==='oferta') { currentOffer=offerWithWait(OFFERS[0]); state.offerCursor=1; } }
   function save() { if (DEMO || DIRECT) return; try { const {speed,...stored}=state; stored.pendingOffer=currentOffer; stored.activeDelivery=acceptedOffer?{offer:acceptedOffer,calc:acceptedCalc,startedAt:waitStart,stage:deliveryStage,measuredWaitMin}:null; localStorage.setItem(KEY,JSON.stringify(stored)); } catch (_) {} }
   function toast(message,error=false) {
     document.querySelector('.toast')?.remove();
     const el = document.createElement('div'); el.className=error?'toast error':'toast'; el.textContent=message; (app.querySelector('.toast-region')||app).appendChild(el);
     clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.remove(),2600);
   }
-  function signalText(s) { return s === 'green' ? 'Conviene' : s === 'yellow' ? 'Justo en la meta' : 'No conviene'; }
+  function signalText(s) { return s === 'green' ? 'Conviene' : s === 'yellow' ? 'Cerca de tu meta' : 'No conviene'; }
+  function offerWithWait(offer) {
+    const observed=state.jobs.filter(j=>j.status==='completed' && j.restaurant===offer.restaurant && j.waitSource==='medida' && Number.isFinite(Number(j.waitMin)));
+    const waitMin=observed.length ? Math.round(observed.reduce((sum,j)=>sum+Number(j.waitMin),0)/observed.length) : offer.waitMin;
+    return {...offer,waitMin,waitCount:observed.length,waitSource:observed.length>=2?'promedio':observed.length===1?'ultima':'ejemplo'};
+  }
   function platformClass(p) { return p === 'Uber Eats' ? 'uber' : p === 'PedidosYa' ? 'pedidos' : 'rappi'; }
   const icon = (name, cls='') => {
     const paths={arrow:'<path d="M5 16 16 5M7 5h9v9"/>',home:'<path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-6h6v6"/>',offer:'<path d="M4 7h16M4 12h16M4 17h10"/><circle cx="19" cy="17" r="2"/>',summary:'<path d="M4 20V10m6 10V4m6 16v-8m4 8V7"/>',map:'<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15m6-12v15"/>',settings:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>',shield:'<path d="m12 2 8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',check:'<path d="m4 12 5 5L20 6"/>',fuel:'<path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h14M7 7h6v5H7zM15 8h2l2 3v7a2 2 0 0 0 2 0v-6l-2-2"/>',bike:'<circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="m5 17 5-9 4 9H5m9 0 5-8h-4m-6-3h3"/>',car:'<path d="m4 16 2-8h12l2 8v4H4zM2 16h20M7 20v2m10-2v2"/>',bolt:'<path d="m13 2-8 11h6l-1 9 9-12h-6z"/>'};
@@ -201,6 +206,15 @@
     if (!currentOffer || screen==='oferta') return '';
     return `<button class="incoming-banner" data-screen="oferta"><span class="live-dot on"></span><span><strong>Oferta de ${escapeHtml(currentOffer.platform)}</strong><small>${escapeHtml(currentOffer.restaurant)} · Toca para revisar</small></span>${icon('arrow','sm')}</button>`;
   }
+  function offerWaitCard(offer) {
+    const count=Number(offer.waitCount)||0;
+    const source=offer.waitSource==='promedio' && count>=2
+      ? `Promedio de ${count} esperas que mediste aquí`
+      : offer.waitSource==='ultima' && count===1
+        ? 'Tu última espera medida aquí'
+        : 'Estimación para esta oferta de prueba';
+    return `<section class="card wait-insight" aria-label="Espera en el restaurante"><div class="wait-insight-head"><div><p class="kicker">ESPERA EN ${escapeHtml(offer.restaurant)}</p><strong>${Number(offer.waitMin)||0} <small>min</small></strong></div>${icon('clock','lg')}</div><p>${source}. No es un dato en vivo del restaurante.</p></section>`;
+  }
   function shell(content) {
     if (screen==='inicio') {
       if(state.profile?.name) content=content.replace('Hola, Luis.',`Hola, ${escapeHtml(state.profile.name.split(/\s+/)[0])}.`);
@@ -212,6 +226,13 @@
       content=settingsExtras()+page.replace('</section>',`</section>${customVehicleEditor()}`);
     }
     if(screen==='resumen') content+=fuelLedger();
+    if(screen==='oferta' && (currentOffer||acceptedOffer)) {
+      const offer=currentOffer||acceptedOffer;
+      const calc=acceptedOffer?acceptedCalc:calculateOffer(offer,vehicle(),state.settings);
+      const decision=calc.signal==='green'?'Aceptar':calc.signal==='yellow'?'Revisar antes de aceptar':'Rechazar';
+      content=content.replace('<div class="verdict ',`${offerWaitCard(offer)}<div class="verdict `);
+      if(!acceptedOffer) content=content.replace(`<div class="v-title">${signalText(calc.signal)}</div>`,`<div class="v-title">Recomendación: ${decision}</div>`);
+    }
     if(screen==='resultado') content=content.replace('<div class="result-actions">',`${platformComparison()}<div class="result-actions">`);
     content=content.replace('Si cargas a otro precio, escríbelo en Ajustes. El GPS de esta demo solo sirve para rutas en Santiago; no detecta la estación.','Al registrar una carga, el precio real por litro actualiza tus próximos cálculos.');
     content=content.replace('El GPS se usa solo cuando pides una ruta o buscas una estación.','El GPS se usa solo cuando creas una ruta o buscas una estación.');
@@ -512,7 +533,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     if (acceptedOffer) { toast('Finaliza el pedido en espera primero.');return; }
     const available=OFFERS.filter(o=>state.connected.includes(o.platform));
     if (index==null && !available.length) { screen='vehiculo';render();toast('Activa una plataforma de ejemplo en Ajustes.',true);return; }
-    currentOffer={...(index==null?available[state.offerCursor++%available.length]:OFFERS[index])}; screen='oferta'; save();render();
+    currentOffer=offerWithWait(index==null?available[state.offerCursor++%available.length]:OFFERS[index]); screen='oferta'; save();render();
   }
   function scheduleNextOffer() {
     state.nextOfferAt=Date.now()+18000+Math.floor(Math.random()*12000);
@@ -521,7 +542,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     if (!state.shiftActive || !state.onboarded || currentOffer || acceptedOffer || !online || document.visibilityState==='hidden' || screen==='vehiculo' || screen==='carga' || state.speed>10 || Date.now()<state.nextOfferAt) return;
     const available=OFFERS.filter(o=>state.connected.includes(o.platform));
     if (!available.length) return;
-    currentOffer={...available[state.offerCursor++%available.length]};
+    currentOffer=offerWithWait(available[state.offerCursor++%available.length]);
     scheduleNextOffer();save();render();
     if (navigator.vibrate) navigator.vibrate([80,50,80]);
     toast(`Nueva oferta de ejemplo: ${currentOffer.platform}`);
