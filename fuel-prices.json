@@ -1,0 +1,32 @@
+{
+  "source": "https://api.bencinaenlinea.cl/api/estaciones/precios_combustibles/export_zonal",
+  "product": "Gasolina 93",
+  "unit": "CLP/L",
+  "fetchedAt": "2026-11-13T03:37:43.766Z",
+  "zones": [
+    {
+      "name": "Zona Norte",
+      "average": 1679.875,
+      "min": 1522,
+      "max": 1722
+    },
+    {
+      "name": "Zona Centro",
+      "average": 1611.346,
+      "min": 1192,
+      "max": 1907
+    },
+    {
+      "name": "Metropolitana",
+      "average": 1575.446,
+      "min": 1387,
+      "max": 1644
+    },
+    {
+      "name": "Zona Sur",
+      "average": 1657.429,
+      "min": 1188,
+      "max": 1902
+    }
+  ]
+}

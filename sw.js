@@ -1,5 +1,5 @@
-const CACHE = 'ultima-milla-v2';
-const ASSETS = ['./', './index.html', './style.css', './calc.js', './app.js', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
+const CACHE = 'ultima-milla-v3';
+const ASSETS = ['./', './index.html', './style.css', './calc.js', './app.js', './fuel-prices.json', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
 const ROOT = new URL('./', self.location.href);
 
 self.addEventListener('install', event => {

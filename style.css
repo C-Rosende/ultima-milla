@@ -93,15 +93,16 @@ ul, ol { padding: 0; list-style: none; }
   padding: max(env(safe-area-inset-top), 16px) max(env(safe-area-inset-right), 14px) 8px max(env(safe-area-inset-left), 20px);
   background: var(--paper);
 }
-.brand { display: flex; align-items: center; gap: 8px; font-weight: 750; font-size: 16px; letter-spacing: -.01em; }
+.brand { display: flex; align-items: center; gap: 8px; min-width: 0; font-weight: 750; font-size: 16px; letter-spacing: -.01em; }
+.brand > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .brand .brand-ic { width: 28px; height: 28px; padding: 5px; border-radius: 9px; background: var(--forest); color: var(--lime); }
 .top-right { display: flex; align-items: center; gap: 4px; }
 .demo-pill {
-  width: 130px; flex: none; text-align: center; line-height: 1.15;
-  font-size: 13px; font-weight: 700; color: var(--ink-2);
+  width: 112px; flex: none; text-align: center; line-height: 1.15;
+  font-size: 10px; font-weight: 700; color: var(--ink-2);
   padding: 5px 4px; border-radius: 10px; background: #e7ece2;
 }
-.demo-pill small { display: block; margin-top: 2px; font-size: 13px; letter-spacing: .025em; }
+.demo-pill small { display: block; margin-top: 2px; font-size: 11px; letter-spacing: .025em; }
 .icon-btn {
   width: 44px; height: 44px; border: 0; border-radius: 12px;
   display: grid; place-items: center;
@@ -469,7 +470,16 @@ h2 { font-size: 17px; line-height: 1.25; font-weight: 700; letter-spacing: -.01e
 .station-row .price small.more { color: var(--muted); font-weight: 500; }
 
 /* Ajustes */
-.veh-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.picker-controls { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin: 12px 0; }
+.picker-controls label, .zone-label { display: grid; gap: 5px; min-width: 0; font-size: 12px; font-weight: 700; }
+.picker-controls select, .zone-label select { width: 100%; min-width: 0; min-height: 44px; padding: 8px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--card); color: var(--ink); font: inherit; font-size: 14px; }
+.intro .picker-controls select { background: #183b2d; border-color: #49705b; color: #fff; }
+.zone-label { margin: 12px 0; }
+.price-highlight { display: grid; gap: 2px; margin: 10px 0; }
+.price-highlight b { color: var(--forest); font-size: 32px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.price-highlight span { color: var(--muted); font-size: 13px; }
+.card .btn + .btn, .card .btn + a.btn { margin-top: 8px; }
+.veh-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
 .veh {
   min-height: 64px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px;
   padding: 10px 12px; border-radius: 14px; text-align: left;
@@ -479,7 +489,7 @@ h2 { font-size: 17px; line-height: 1.25; font-weight: 700; letter-spacing: -.01e
 .veh:active { transform: scale(.97); }
 .veh .ic { width: 26px; height: 26px; color: var(--ink-2); }
 .veh .vn { font-size: 14px; font-weight: 650; line-height: 1.2; }
-.veh .vn { display: inline-block; white-space: nowrap; }
+.veh .vn { display: inline-block; white-space: normal; }
 .veh[data-vehicle="scooter"] .vn { white-space: normal; text-wrap: balance; }
 .veh > span { min-width: 0; }
 .veh .vg { font-size: 13px; color: var(--muted); }
@@ -676,8 +686,10 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
   .chip { min-width: 0; gap: 3px; padding: 0 5px 0 3px; font-size: 11px; white-space: nowrap; }
   .chip .logo { width: 20px; height: 20px; border-radius: 6px; }
   .fact dt { white-space: nowrap; font-size: 12px; }
-  .brand { font-size: 15px; }
-  .demo-pill { width: 120px; font-size: 13px; }
+  .top { padding-left: max(env(safe-area-inset-left), 12px); padding-right: max(env(safe-area-inset-right), 8px); }
+  .brand { font-size: 14px; gap: 5px; }
+  .brand .brand-ic { width: 25px; height: 25px; flex: none; }
+  .demo-pill { width: 104px; font-size: 10px; }
   .inv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
