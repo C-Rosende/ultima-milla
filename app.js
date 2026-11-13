@@ -4,7 +4,7 @@
   const KEY = 'ultima-milla-demo-v1';
   const DEMO = new URLSearchParams(location.search).get('demo') === '1';
   const DIRECT = new URLSearchParams(location.search).get('pantalla');
-  const LUIS = globalThis.DATOS?.luis.cifras;
+  const LUIS = globalThis.DATOS?.luis?.cifras || { espera_min:110, pedidos:19 };
   if (new URLSearchParams(location.search).get('embebido') === '1') document.body.classList.add('embedded');
   if (DIRECT === 'resumen' && new URLSearchParams(location.search).get('compacto') === '1') document.body.classList.add('compact-summary');
   const SCREENS = ['inicio', 'oferta', 'resumen', 'mapa', 'vehiculo'];
@@ -17,6 +17,7 @@
     { id:'swift', group:'Auto', name:'Suzuki Swift', type:'fuel', consumption:17, maintenance:92, investment:10400000, icon:'🚗', unit:'km/l' },
     { id:'urban', group:'Bicicleta', name:'Bicicleta urbana', type:'human', consumption:1, maintenance:22, investment:280000, icon:'🚲', unit:'sin combustible' },
     { id:'ebike', group:'Bici eléctrica', name:'Oxford E-Bike', type:'electric', consumption:75, maintenance:32, investment:1250000, icon:'⚡', unit:'km/kWh' },
+    { id:'emoto', group:'Moto eléctrica', name:'Moto eléctrica urbana', type:'electric', consumption:38, maintenance:38, investment:2400000, icon:'⚡', unit:'km/kWh' },
     { id:'scooter', group:'Scooter', name:'Xiaomi Electric Scooter', type:'electric', consumption:40, maintenance:28, investment:580000, icon:'🛴', unit:'km/kWh' }
   ];
   const OFFERS = [
@@ -34,7 +35,7 @@
   ];
   const app = document.getElementById('app');
   const money = n => MONEY.format(Math.round(Number(n) || 0));
-  const vehicle = () => VEHICLES.find(v => v.id === state.vehicleId) || VEHICLES[0];
+  const vehicle = () => state.vehicleId === 'custom' && state.customVehicle ? state.customVehicle : VEHICLES.find(v => v.id === state.vehicleId) || VEHICLES[0];
   const today = () => new Date().toLocaleDateString('sv-SE');
   const dayAgo = n => { const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()-n); return d.toLocaleDateString('sv-SE'); };
   function seedHistory() {
@@ -64,7 +65,7 @@
     }
     return jobs;
   }
-  function defaults() { return { onboarded:false, connected:[], vehicleId:'cb190', settings:{fuelPrice:1300,kwhPrice:220,dataMonthly:12000,hoursMonthly:200,goal:5000,investment:2850000}, jobs:[], speed:0, offerCursor:0 }; }
+  function defaults() { return { onboarded:false, profile:null, connected:[], vehicleId:'cb190', customVehicle:null, settings:{fuelPrice:1300,kwhPrice:220,dataMonthly:12000,hoursMonthly:200,goal:5000,investment:2850000}, jobs:[], speed:0, offerCursor:0 }; }
   function load() {
     if (DEMO || DIRECT) return { ...defaults(), jobs:seedHistory() };
     try {
@@ -73,10 +74,10 @@
         if (raw.jobs.some(j=>j.id?.startsWith('seed-13-')) && !raw.jobs.some(j=>j.id?.startsWith('seed-14-'))) {
           raw.jobs = [...seedHistory().filter(j=>j.date<dayAgo(13)), ...raw.jobs];
         }
-        return { ...defaults(), ...raw, speed:0 };
+        return { ...defaults(), ...raw, onboarded: Boolean(raw.onboarded && raw.profile), speed:0 };
       }
     } catch (_) { /* El prototipo sigue funcionando si el almacenamiento está deshabilitado. */ }
-    return { ...defaults(), jobs:seedHistory() };
+    return defaults();
   }
   let state = load();
   let screen = SCREENS.includes(DIRECT) ? DIRECT : 'inicio';
@@ -104,9 +105,43 @@
     return `<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true">${paths[name]||paths.arrow}</svg>`;
   };
   const logo = p => `<span class="logo ${platformClass(p)}" aria-hidden="true">${p==='Uber Eats'?'U':p==='PedidosYa'?'P':'R'}</span>`;
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function head(showSafety=true) { return `<header class="top"><div class="brand"><span class="brand-ic">${icon('arrow')}</span>Última Milla</div><div class="top-right"><span class="demo-pill">DEMOSTRACIÓN<small>SIN CONEXIÓN</small></span>${showSafety?`<button class="icon-btn" data-action="speed" aria-label="Probar bloqueo por movimiento" title="Probar bloqueo por movimiento">${icon('shield')}</button>`:''}</div></header>`; }
   function nav() { return `<nav class="tabbar" aria-label="Navegación principal">${[['inicio','home','Inicio'],['oferta','offer','Oferta'],['resumen','summary','Resumen'],['mapa','map','Mapa'],['vehiculo','settings','Ajustes']].map(([id,ic,label])=>`<button class="tab ${screen===id?'pop':''}" data-screen="${id}" aria-label="${label}" ${screen===id?'aria-current="page"':''}>${icon(ic)}<span>${label}</span>${id==='oferta'&&currentOffer?'<i class="badge" aria-hidden="true"></i>':''}</button>`).join('')}</nav>`; }
-  function shell(content) { return `<div class="shell" ${state.speed>10?'inert':''}><a class="skip-link" href="#main">Ir al contenido</a>${head()}<main class="scroll" id="main" tabindex="-1"><div class="${lastScreen!==screen?'enter ':''}stack">${content}</div></main>${nav()}</div>${state.speed>10?security():''}<div class="toast-region" role="status" aria-live="polite"></div>`; }
+  function shell(content) { if (screen==='inicio' && state.profile?.name) content=content.replace('Hola, Luis.',`Hola, ${escapeHtml(state.profile.name.split(/\s+/)[0])}.`); if(screen==='vehiculo') { const page=content.replace(/^<div>.*?<\/div>/,'').replace('<h2>Vehículo</h2>',`<h2>Vehículo</h2><p class="note">En uso: ${escapeHtml(vehicle().name)}</p>`); content=settingsExtras()+page.replace('</section>',`</section>${customVehicleEditor()}`); } return `<div class="shell" ${state.speed>10?'inert':''}><a class="skip-link" href="#main">Ir al contenido</a>${head()}<main class="scroll" id="main" tabindex="-1"><div class="${lastScreen!==screen?'enter ':''}stack">${content}</div></main>${nav()}</div>${state.speed>10?security():''}<div class="toast-region" role="status" aria-live="polite"></div>`; }
+  function onboarding() {
+    const step = introStep;
+    const title = ['Tu turno empieza aquí.', 'Elige las plataformas.', 'Cada kilómetro cuenta.'][step];
+    const description = [
+      'Crea un perfil local para recorrer la app como repartidor. No necesitas contraseña.',
+      'Activa las plataformas cuyos pedidos de ejemplo quieres recibir.',
+      'Elige tu vehículo para estimar combustible, mantención y ganancia neta.'
+    ][step];
+    const platforms = ['Uber Eats','PedidosYa','Rappi'];
+    const body = step === 0
+      ? `<form class="signup-form" id="signup-form"><label for="signup-name">Tu nombre</label><input id="signup-name" name="name" autocomplete="name" required minlength="2" maxlength="40" placeholder="Ej. Camila" value="${escapeHtml(state.profile?.name)}"><label for="signup-email">Tu correo</label><input id="signup-email" name="email" type="email" autocomplete="email" required maxlength="120" placeholder="nombre@correo.com" value="${escapeHtml(state.profile?.email)}"><p class="privacy-note">Este perfil vive solo en este navegador. No enviamos datos ni creamos una cuenta en un servidor.</p></form>`
+      : step === 1
+      ? `<div class="connect-list">${platforms.map(p=>`<button class="connect" data-connect="${p}" aria-pressed="${state.connected.includes(p)}">${logo(p)}<span><span class="cn">${p}</span><br><span class="cs">Pedidos de ejemplo · sin acceso a tu cuenta</span></span><span class="state">${state.connected.includes(p)?'Activo':'Activar'}</span></button>`).join('')}</div><p class="trust">${icon('shield')} Nunca ingreses aquí tu clave de las plataformas.</p>`
+      : `<div class="veh-grid onboarding-vehicles">${VEHICLES.map(v=>`<button class="veh" data-vehicle="${v.id}" aria-pressed="${v.id===state.vehicleId}">${icon(v.type==='human'?'bike':v.type==='electric'?'bolt':v.group==='Auto'?'car':'fuel')}<span><span class="vn">${v.name}</span><br><span class="vg">${v.group}</span></span></button>`).join('')}</div><p class="trust">${icon('check')} Puedes ajustar modelo, motor y costos en Ajustes.</p>`;
+    return `<div class="intro onboard">${head(false)}<div class="intro-body"><p class="step">PASO ${step+1} DE 3 · PERFIL LOCAL</p><h1 tabindex="-1" id="page-title">${title}</h1><p class="lead">${description}</p>${body}</div><div class="intro-bottom"><div class="steps-dots" aria-hidden="true"><i class="on"></i><i class="${step>0?'on':''}"></i><i class="${step>1?'on':''}"></i></div><div class="onboard-actions">${step>0?'<button class="btn outline" data-action="onboard-back">Atrás</button>':''}<button class="btn lime big" data-action="${step===0?'save-profile-first':step===1?'intro-next':'finish-onboarding'}">${step===0?'Crear perfil':step===1?'Elegir vehículo':'Empezar mi turno'} ${icon('arrow','sm')}</button></div></div></div><div class="toast-region" role="status" aria-live="polite"></div>`;
+  }
+  function settingsExtras() {
+    const platforms = ['Uber Eats','PedidosYa','Rappi'];
+    return `<div><p class="kicker">Tu espacio de trabajo</p><h1 class="title" id="page-title" tabindex="-1">Ajustes</h1><p class="lead">Controla tu perfil, plataformas de ejemplo y costos.</p></div><section class="card"><h2>Perfil local</h2><form class="signup-form compact" id="profile-form"><label for="profile-name">Nombre</label><input id="profile-name" name="name" required minlength="2" maxlength="40" value="${escapeHtml(state.profile?.name)}"><label for="profile-email">Correo</label><input id="profile-email" name="email" type="email" required maxlength="120" value="${escapeHtml(state.profile?.email)}"><button type="button" class="btn outline block" data-action="save-profile">Guardar perfil</button></form><p class="note">Solo en este dispositivo. No es una cuenta en línea.</p></section><section class="card"><h2>Plataformas de ejemplo</h2><p class="note">Activar una plataforma muestra sus ofertas simuladas. No se conecta a Uber Eats, PedidosYa ni Rappi.</p><div class="connect-list settings-connect">${platforms.map(p=>`<button class="connect" data-connect="${p}" aria-pressed="${state.connected.includes(p)}">${logo(p)}<span><span class="cn">${p}</span><br><span class="cs">Sin acceso a tu cuenta real</span></span><span class="state">${state.connected.includes(p)?'Activo':'Activar'}</span></button>`).join('')}</div></section>`;
+  }
+  function customVehicleEditor() {
+    const v=state.customVehicle;
+    return `<section class="card"><details class="custom-vehicle"><summary>Configurar mi propio vehículo ${icon('arrow','sm')}</summary><p class="note">Usa datos reales si los conoces; si no, parte de una estimación y ajústala después.</p><form id="custom-vehicle-form" class="signup-form compact"><label for="custom-group">Tipo de vehículo</label><select id="custom-group" name="group"><option ${v?.group==='Auto'?'selected':''}>Auto</option><option ${v?.group==='Moto'?'selected':''}>Moto</option><option ${v?.group==='Bicicleta'?'selected':''}>Bicicleta</option><option ${v?.group==='Scooter'?'selected':''}>Scooter</option></select><label for="custom-type">Propulsión</label><select id="custom-type" name="type"><option value="fuel" ${v?.type==='fuel'?'selected':''}>Gasolina</option><option value="electric" ${v?.type==='electric'?'selected':''}>Eléctrica</option><option value="human" ${v?.type==='human'?'selected':''}>Sin motor</option></select><label for="custom-name">Modelo o nombre</label><input id="custom-name" name="model" maxlength="50" placeholder="Ej. moto urbana 150 cc" value="${escapeHtml(v?.name)}"><label for="custom-motor">Potencia del motor eléctrico (W)</label><input id="custom-motor" name="motorW" type="number" min="100" max="15000" step="1" inputmode="numeric" placeholder="Ej. 500" value="${v?.motorW||''}"><p class="note">Si es eléctrico, indica el modelo o la potencia del motor.</p><label for="custom-consumption">Rendimiento: km/l o km/kWh</label><input id="custom-consumption" name="consumption" type="number" min="0.1" max="500" step="0.1" inputmode="decimal" required value="${v?.consumption||35}"><p class="note">El motor en W no basta para calcular el gasto; ajusta el rendimiento.</p><label for="custom-maintenance">Mantención estimada ($/km)</label><input id="custom-maintenance" name="maintenance" type="number" min="0" max="1000" step="1" inputmode="numeric" required value="${v?.maintenance??50}"><label for="custom-investment">Precio o inversión ($)</label><input id="custom-investment" name="investment" type="number" min="0" max="100000000" step="1000" inputmode="numeric" required value="${v?.investment??0}"><button type="button" class="btn lime block" data-action="save-custom-vehicle">Usar este vehículo</button></form></details></section>`;
+  }
+  function syncCustomVehicleForm(form) {
+    const group=form.elements.group.value, type=form.elements.type;
+    for (const option of type.options) option.disabled=(option.value==='fuel' && ['Bicicleta','Scooter'].includes(group)) || (option.value==='human' && group!=='Bicicleta') || (group==='Scooter' && option.value!=='electric');
+    if (type.selectedOptions[0]?.disabled) type.value=group==='Scooter'?'electric':group==='Bicicleta'?'human':'fuel';
+    const electric=type.value==='electric', human=type.value==='human';
+    form.elements.motorW.disabled=!electric;
+    form.elements.consumption.disabled=human;
+    form.querySelector('label[for="custom-consumption"]').textContent=human?'Rendimiento: no aplica':`Rendimiento estimado (${electric?'km/kWh':'km/l'})`;
+  }
   function intro() {
     const second=introStep===1;
     return `<div class="intro">${head(false)}<div class="intro-body"><p class="step">PASO ${second?'2':'1'} DE 2 · DEMOSTRACIÓN</p><h1 tabindex="-1" id="page-title">${second?'Tu vehículo.<br>Tu ganancia.':'Más entregas.<br>Más claridad.'}</h1><p class="lead">${second?'Elige tu vehículo. Puedes ajustar sus costos después.':'Antes de aceptar, mira cuánto queda después de cada kilómetro y cada minuto.'}</p>${second?`<div class="veh-grid" style="margin-top:20px">${VEHICLES.map(v=>`<button class="veh" data-vehicle="${v.id}" aria-pressed="${v.id===state.vehicleId}">${icon(v.type==='human'?'bike':v.type==='electric'?'bolt':v.group==='Auto'?'car':'fuel')}<span><span class="vn">${v.name}</span><br><span class="vg">${v.group}</span></span></button>`).join('')}</div><p class="trust">${icon('check')} Valores iniciales editables.</p>`:`<div class="connect-list">${['Uber Eats','PedidosYa','Rappi'].map(p=>`<button class="connect" data-connect="${p}" aria-pressed="${state.connected.includes(p)}">${logo(p)}<span><span class="cn">${p}</span><br><span class="cs">Conexión simulada</span></span><span class="state">${state.connected.includes(p)?'Lista':'Conectar'}</span></button>`).join('')}</div><p class="trust">${icon('shield')} Sin claves ni acceso a tus aplicaciones.</p>`}</div><div class="intro-bottom"><div class="steps-dots" aria-hidden="true"><i class="on"></i><i class="${second?'on':''}"></i></div><button class="btn lime big block" data-action="${second?'finish-onboarding':'intro-next'}">${second?'Entrar a mi turno':'Conectar las 3 y seguir'} ${icon('arrow','sm')}</button></div></div><div class="toast-region" role="status" aria-live="polite"></div>`;
@@ -186,15 +221,17 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
   function vehiclePage() {
     const v=vehicle(),{investment,net,remaining,progress}=recovery();
     const fields=[['fuelPrice','Precio de bencina 93','por litro',0,3000,1],['kwhPrice','Precio de electricidad','por kWh',0,1000,1],['dataMonthly','Datos móviles','al mes',0,100000,100],['hoursMonthly','Horas de trabajo','al mes',1,400,1],['goal','Meta neta','por hora',1,100000,100],['investment','Invertido en el vehículo','total',0,100000000,1000]];
-    return `<div><p class="kicker">Tus costos reales</p><h1 class="title" id="page-title" tabindex="-1">Tu vehículo, tus números</h1><p class="lead">Partimos con valores de ejemplo. Ajústalos cuando quieras.</p></div><section class="card"><h2>Vehículo</h2><div class="veh-grid" style="margin-top:12px">${VEHICLES.map(x=>`<button class="veh" data-vehicle="${x.id}" aria-pressed="${x.id===v.id}">${icon(x.type==='human'?'bike':x.type==='electric'?'bolt':x.group==='Auto'?'car':'fuel')}<span><span class="vn">${x.name}</span><br><span class="vg">${x.group}</span></span></button>`).join('')}</div><p class="note" style="margin-top:10px">${v.type==='human'?'Sin combustible':`${v.consumption} ${v.unit}`} · ${money(v.maintenance)}/km en mantención estimada.</p></section><section class="card"><h2>Valores para calcular</h2><div class="fields" style="margin-top:12px">${fields.map(([key,label,suffix,min,max,step])=>`<div class="field"><label for="setting-${key}">${label}</label><div class="input-wrap"><span class="pre" aria-hidden="true">${key==='hoursMonthly'?'':'$'}</span><input id="setting-${key}" type="text" inputmode="numeric" min="${min}" max="${max}" step="${step}" data-setting="${key}" value="${Number(state.settings[key]).toLocaleString('es-CL')}" aria-describedby="hint-${key}"><span class="suf" aria-hidden="true">${suffix}</span></div><p class="hint" id="hint-${key}">Valor de demostración; se guarda solo aquí.</p></div>`).join('')}</div><p class="note" style="margin-top:14px">Semáforo: verde si llega a tu meta; amarillo entre 90 % y 99 %; rojo bajo 90 %.</p></section><section class="card"><h2>Inversión</h2><dl class="inv-grid"><div><dt>Invertido</dt><dd>${money(investment)}</dd></div><div><dt>Neto acumulado</dt><dd>${money(net)}</dd></div><div><dt>Por recuperar*</dt><dd>${money(remaining)}</dd></div></dl><div class="progress grow"><span style="width:${progress}%"></span></div><p class="note" style="margin-top:10px">* Comparación ilustrativa, no amortización contable.</p></section><section class="card"><h2>Demostración y seguridad</h2><p class="note">Velocidad simulada: ${state.speed} km/h.</p><div class="btn-col" style="margin-top:12px"><button class="btn outline block" data-action="speed">Probar bloqueo a 15 km/h</button><button class="btn danger block" data-action="reset">Reiniciar demostración</button></div></section><p class="note center">Sin cuentas ni GPS. Los cambios se guardan en este navegador.</p>`;
+    return `<div><p class="kicker">Tus costos reales</p><h1 class="title" id="page-title" tabindex="-1">Tu vehículo, tus números</h1><p class="lead">Partimos con valores de ejemplo. Ajústalos cuando quieras.</p></div><section class="card"><h2>Vehículo</h2><div class="veh-grid" style="margin-top:12px">${VEHICLES.map(x=>`<button class="veh" data-vehicle="${x.id}" aria-pressed="${x.id===v.id}">${icon(x.type==='human'?'bike':x.type==='electric'?'bolt':x.group==='Auto'?'car':'fuel')}<span><span class="vn">${x.name}</span><br><span class="vg">${x.group}</span></span></button>`).join('')}</div><p class="note" style="margin-top:10px">${v.type==='human'?'Sin combustible':`${v.consumption} ${v.unit}`} · ${money(v.maintenance)}/km en mantención estimada.</p></section><section class="card"><h2>Valores para calcular</h2><div class="fields" style="margin-top:12px">${fields.map(([key,label,suffix,min,max,step])=>`<div class="field"><label for="setting-${key}">${label}</label><div class="input-wrap"><span class="pre" aria-hidden="true">${key==='hoursMonthly'?'':'$'}</span><input id="setting-${key}" type="text" inputmode="numeric" min="${min}" max="${max}" step="${step}" data-setting="${key}" value="${Number(state.settings[key]).toLocaleString('es-CL')}" aria-describedby="hint-${key}"><span class="suf" aria-hidden="true">${suffix}</span></div><p class="hint" id="hint-${key}">Valor de demostración; se guarda solo aquí.</p></div>`).join('')}</div><p class="note" style="margin-top:14px">Semáforo: verde si llega a tu meta; amarillo entre 90 % y 99 %; rojo bajo 90 %.</p></section><section class="card"><h2>Inversión</h2><dl class="inv-grid"><div><dt>Invertido</dt><dd>${money(investment)}</dd></div><div><dt>Neto acumulado</dt><dd>${money(net)}</dd></div><div><dt>Por recuperar*</dt><dd>${money(remaining)}</dd></div></dl><div class="progress grow"><span style="width:${progress}%"></span></div><p class="note" style="margin-top:10px">* Comparación ilustrativa, no amortización contable.</p></section><section class="card"><h2>Demostración y seguridad</h2><p class="note">Velocidad simulada: ${state.speed} km/h.</p><div class="btn-col" style="margin-top:12px"><button class="btn outline block" data-action="speed">Probar bloqueo a 15 km/h</button><button class="btn danger block" data-action="reset">Borrar mis datos locales</button></div></section><p class="note center">Sin cuentas en línea ni GPS. Los cambios se guardan en este navegador.</p>`;
   }
   function security() { return `<div class="security" role="alertdialog" aria-modal="true" aria-labelledby="security-title" aria-describedby="security-desc"><div class="sec-card"><span class="sec-icon">${icon('shield','lg')}</span><h2 id="security-title">Primero, detente</h2><p id="security-desc">Sobre 10 km/h bloqueamos los botones. Tu seguridad va primero.</p><div class="sec-speed">${state.speed}<small>km/h</small></div><button class="btn lime big block" data-action="stop">Simular detención</button><p>Control simulado: no usa GPS.</p></div></div>`; }
   function render() {
     const oldScroll=document.getElementById('main')?.scrollTop||0;
     const changed=lastScreen!==screen;
-    const markup=!state.onboarded?intro():shell(({inicio:home,oferta:offerPage,resumen:summary,mapa:mapPage,vehiculo:vehiclePage})[screen]());
+    const markup=!state.onboarded?onboarding():shell(({inicio:home,oferta:offerPage,resumen:summary,mapa:mapPage,vehiculo:vehiclePage})[screen]());
     app.innerHTML=markup.replace(/(\d+)\.(\d+)(?=\s*km\b)/g,'$1,$2');
     const main=document.getElementById('main');
+    const customForm=document.getElementById('custom-vehicle-form');
+    if(customForm) syncCustomVehicleForm(customForm);
     if (main) main.scrollTop=changed?0:oldScroll;
     if (changed && lastScreen!==null) document.getElementById('page-title')?.focus({preventScroll:true});
     lastScreen=screen;
@@ -235,7 +272,9 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
   }
   function simulate(index) {
     if (acceptedOffer) { toast('Finaliza el pedido en espera primero.');return; }
-    currentOffer={...OFFERS[index==null?state.offerCursor++%OFFERS.length:index]}; screen='oferta'; save();render();
+    const available=OFFERS.filter(o=>state.connected.includes(o.platform));
+    if (index==null && !available.length) { screen='vehiculo';render();toast('Activa una plataforma de ejemplo en Ajustes.',true);return; }
+    currentOffer={...(index==null?available[state.offerCursor++%available.length]:OFFERS[index])}; screen='oferta'; save();render();
   }
   function finishDelivery() {
     if(!acceptedOffer)return;
@@ -257,20 +296,42 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     if(button.dataset.period){period=button.dataset.period;render();return;}
     if(button.dataset.vehicle){state.vehicleId=button.dataset.vehicle;state.settings.investment=vehicle().investment;save();render();return;}
     if(button.dataset.station){stationId=button.dataset.station;render();return;}
-    if(button.dataset.connect){const p=button.dataset.connect;if(state.connected.includes(p))return;button.classList.add('connecting');button.textContent='Conectando…';button.disabled=true;setTimeout(()=>{if(!state.connected.includes(p))state.connected.push(p);save();render();},650);return;}
-    if(action==='intro-next'){button.disabled=true;button.textContent='Conectando demo…';setTimeout(()=>{state.connected=['Uber Eats','PedidosYa','Rappi'];introStep=1;save();render();},750);return;}
+    if(button.dataset.connect){const p=button.dataset.connect;if(state.connected.includes(p))state.connected=state.connected.filter(x=>x!==p);else state.connected.push(p);save();render();return;}
+    if(action==='save-profile-first' || action==='save-profile'){
+      const form=document.getElementById(action==='save-profile-first'?'signup-form':'profile-form');
+      if(!form.reportValidity())return;
+      const name=form.elements.name.value.trim().replace(/\s+/g,' '),email=form.elements.email.value.trim();
+      if(name.length<2 || name.length>40 || email.length>120){toast('Revisa tu nombre y correo.',true);return;}
+      state.profile={name,email};save();
+      if(action==='save-profile-first'){introStep=1;render();}else{render();toast('Perfil guardado en este dispositivo.');}
+      return;
+    }
+    if(action==='onboard-back'){introStep=Math.max(0,introStep-1);render();return;}
+    if(action==='intro-next'){if(!state.connected.length){toast('Activa al menos una plataforma de ejemplo.',true);return;}introStep=2;save();render();return;}
     if(action==='finish-onboarding'){state.onboarded=true;save();screen='inicio';render();return;}
+    if(action==='save-custom-vehicle'){
+      const form=document.getElementById('custom-vehicle-form');if(!form.reportValidity())return;
+      const group=form.elements.group.value,type=form.elements.type.value,name=form.elements.model.value.trim(),motorW=Number(form.elements.motorW.value)||0;
+      if((group==='Scooter' && type!=='electric') || (group==='Bicicleta' && type==='fuel') || ((group==='Auto'||group==='Moto') && type==='human')){toast('Esa combinación de vehículo y propulsión no es válida.',true);return;}
+      if(type==='electric' && !name && !motorW){toast('Para un eléctrico, indica modelo o potencia del motor.',true);return;}
+      const consumption=Number(form.elements.consumption.value),maintenance=Number(form.elements.maintenance.value),investment=Number(form.elements.investment.value);
+      if(!Number.isFinite(consumption)||consumption<.1||consumption>500||!Number.isFinite(maintenance)||maintenance<0||maintenance>1000||!Number.isFinite(investment)||investment<0||investment>100000000){toast('Revisa los valores del vehículo.',true);return;}
+      const fallbackName=type==='electric'?`${group} ${['Moto','Bicicleta'].includes(group)?'eléctrica':'eléctrico'}`:`${group} personalizado`;
+      state.customVehicle={id:'custom',group,name:name||fallbackName,motorW,type,consumption:type==='human'?1:consumption,maintenance,investment,unit:type==='fuel'?'km/l':type==='electric'?'km/kWh':'sin combustible'};
+      state.vehicleId='custom';state.settings.investment=investment;save();render();toast('Vehículo personalizado activo.');return;
+    }
     if(action==='simulate'){simulate();return;}
     if(action==='accept'){acceptedOffer=currentOffer;acceptedCalc=calculateOffer(currentOffer,vehicle(),state.settings);currentOffer=null;waitStart=Date.now();render();toast('Pedido aceptado · cronómetro iniciado.');return;}
     if(action==='reject'){rejectOffer();return;}
     if(action==='finish-delivery'){finishDelivery();return;}
     if(action==='speed'){state.speed=15;render();return;}
     if(action==='stop'){state.speed=0;render();toast('Interacción desbloqueada.');return;}
-    if(action==='reset'){if(confirm('¿Reiniciar la demostración? Se borrarán tus cambios y volverán los datos de ejemplo.')){try{localStorage.removeItem(KEY)}catch(_){}state={...defaults(),jobs:seedHistory()};introStep=0;currentOffer=null;acceptedOffer=null;acceptedCalc=null;waitStart=0;screen='inicio';render();}return;}
+    if(action==='reset'){if(confirm('¿Borrar el perfil, la configuración y el historial guardados en este navegador?')){try{localStorage.removeItem(KEY)}catch(_){}state=defaults();introStep=0;currentOffer=null;acceptedOffer=null;acceptedCalc=null;waitStart=0;screen='inicio';render();}return;}
   });
   app.addEventListener('change',e=>{
     if(state.speed>10)return;
     const t=e.target;
+    if(t.id==='custom-group' || t.id==='custom-type'){syncCustomVehicleForm(t.form);return;}
     if(t.dataset.field==='vehicleId'){state.vehicleId=t.value;state.settings.investment=vehicle().investment;save();render();return;}
     if(t.dataset.setting){const key=t.dataset.setting,raw=t.value.trim()===''?NaN:Number(t.value.replace(/\./g,'')),lo=Number(t.min),hi=Number(t.max);if(!Number.isFinite(raw)||!Number.isInteger(raw)||raw<lo||raw>hi){t.setAttribute('aria-invalid','true');t.closest('.field')?.classList.add('invalid');toast(`Ingresa un valor entre ${lo} y ${hi}.`,true);return;}state.settings[key]=raw;save();render();toast('Valor actualizado.');}
   });
@@ -284,7 +345,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
   });
   setInterval(updateTimer,1000);
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').then(registration => registration.update()).catch(() => {}));
   }
   if(DEMO && !DIRECT){
     function loop() {

@@ -1,9 +1,9 @@
-const CACHE = 'ultima-milla-v1';
+const CACHE = 'ultima-milla-v2';
 const ASSETS = ['./', './index.html', './style.css', './calc.js', './app.js', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
 const ROOT = new URL('./', self.location.href);
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS.map(path => new URL(path, ROOT)))));
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS.map(path => new URL(path, ROOT)))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', event => {
@@ -16,5 +16,11 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET' || new URL(request.url).origin !== ROOT.origin || !request.url.startsWith(ROOT.href)) return;
-  event.respondWith(caches.match(request, { ignoreSearch: request.mode === 'navigate' }).then(cached => cached || fetch(request)));
+  event.respondWith(fetch(request).then(response => {
+    if (response.ok) {
+      const copy = response.clone();
+      event.waitUntil(caches.open(CACHE).then(cache => cache.put(request, copy)));
+    }
+    return response;
+  }).catch(() => caches.match(request, { ignoreSearch: request.mode === 'navigate' })));
 });

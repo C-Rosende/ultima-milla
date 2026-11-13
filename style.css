@@ -619,6 +619,36 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .sec-card .btn { margin-top: 18px; }
 
 /* Foco */
+.signup-form { display: grid; gap: 8px; margin-top: 20px; }
+.signup-form.compact { margin-top: 14px; }
+.signup-form label { font-size: 13px; font-weight: 700; letter-spacing: .01em; }
+.signup-form input, .signup-form select {
+  width: 100%; min-height: 48px; padding: 10px 13px;
+  border: 1px solid var(--line-2); border-radius: 12px;
+  background: #fff; color: var(--ink); font: inherit; font-size: 16px;
+}
+.signup-form input::placeholder { color: #728078; }
+.signup-form input:focus, .signup-form select:focus { border-color: var(--green); outline: 3px solid rgba(68, 133, 92, .18); }
+.signup-form .btn { margin-top: 6px; }
+.intro .signup-form input { background: rgba(255,255,255,.09); color: #fff; border-color: rgba(255,255,255,.27); }
+.intro .signup-form input::placeholder { color: #a9bcb1; }
+.intro .signup-form input:focus { border-color: var(--lime); outline-color: rgba(200,240,108,.23); }
+.privacy-note { color: #c3d0c5; font-size: 13px; line-height: 1.5; margin-top: 10px; }
+.onboard-actions { display: flex; gap: 9px; }
+.onboard-actions .btn:last-child { flex: 1; }
+.onboard-actions .btn.outline { background: transparent; border-color: rgba(255,255,255,.35); color: #fff; }
+.onboarding-vehicles { margin-top: 20px; }
+.settings-connect { margin-top: 14px; }
+.settings-connect .connect { background: #f7f9f5; color: var(--ink); border-color: var(--line-2); }
+.settings-connect .connect .cs { color: var(--muted); }
+.settings-connect .connect .state { background: #e9eee6; color: var(--ink); }
+.settings-connect .connect[aria-pressed="true"] { background: var(--green-soft); border-color: var(--green); }
+.settings-connect .connect[aria-pressed="true"] .state { background: var(--forest); color: #fff; }
+.custom-vehicle summary { display: flex; align-items: center; justify-content: space-between; cursor: pointer; font-weight: 700; list-style: none; }
+.custom-vehicle summary::-webkit-details-marker { display: none; }
+.custom-vehicle[open] summary { margin-bottom: 12px; }
+.custom-vehicle[open] summary .ic { transform: rotate(45deg); }
+.custom-vehicle .note { margin: 4px 0 6px; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .intro :focus-visible, .hero :focus-visible, .sec-card :focus-visible { outline-color: var(--lime); }
 .title:focus-visible, .intro h1:focus-visible, .sec-card h2:focus-visible, .st:focus-visible { outline: none; }
