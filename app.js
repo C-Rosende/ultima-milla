@@ -131,6 +131,9 @@
   let routeStatus = 'Toca “Crear ruta con mi GPS” para ver un trayecto real por calles.';
   let routeLoading = false;
   let refuelStation = '';
+  let refuelSuggestedStation = '';
+  let refuelStatus = 'Busca una estación cercana con tu GPS o escribe su nombre.';
+  let refuelLoading = false;
   let routeWait = 0;
   let routeZoom = null;
   let routeCursor = -1;
@@ -208,7 +211,7 @@
     }
     if(screen==='resumen') content+=fuelLedger();
     content=content.replace('Si cargas a otro precio, escríbelo en Ajustes. El GPS de esta demo solo sirve para rutas en Santiago; no detecta la estación.','Al registrar una carga, el precio real por litro actualiza tus próximos cálculos.');
-    content=content.replace('El GPS se usa solo cuando creas una ruta.','El GPS se usa solo cuando creas una ruta o buscas una estación.');
+    content=content.replace('El GPS se usa solo cuando pides una ruta o buscas una estación.','El GPS se usa solo cuando creas una ruta o buscas una estación.');
     return `<div class="shell" ${state.speed>10?'inert':''}><a class="skip-link" href="#main">Ir al contenido</a>${head()}<main class="scroll" id="main" tabindex="-1"><div class="${lastScreen!==screen?'enter ':''}stack">${incomingBanner()}${content}</div></main>${nav()}</div>${state.speed>10?security():''}<div class="toast-region" role="status" aria-live="polite"></div>`;
   }
   function onboarding() {
@@ -342,6 +345,45 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     const h=Math.sin(dLat/2)**2+Math.cos(a.lat*rad)*Math.cos(b.lat*rad)*Math.sin(dLon/2)**2;
     return 12742*Math.asin(Math.min(1,Math.sqrt(h)));
   }
+  function updateRefuelFeedback() {
+    const status=app.querySelector('[data-refuel-status]');
+    const button=app.querySelector('[data-action="refuel-gps"]');
+    if(status) status.textContent=refuelStatus;
+    if(button) { button.disabled=refuelLoading;button.textContent=refuelLoading?'Buscando estación…':'Buscar con mi GPS';button.setAttribute('aria-busy',String(refuelLoading)); }
+  }
+  async function lookupRefuelStation() {
+    if(refuelLoading)return;
+    if(!navigator.geolocation || !online){refuelStatus='Sin GPS o conexión. Puedes escribir la estación y registrar la carga.';updateRefuelFeedback();return;}
+    const input=app.querySelector('#refuel-station');
+    if(refuelSuggestedStation && input?.value===refuelSuggestedStation){input.value='';refuelStation='';}
+    refuelSuggestedStation='';
+    refuelLoading=true;refuelStatus='Ubicándote. Esta búsqueda se hace solo ahora.';updateRefuelFeedback();
+    try {
+      const pos=await new Promise((resolve,reject)=>navigator.geolocation.getCurrentPosition(resolve,reject,{enableHighAccuracy:true,timeout:12000,maximumAge:30000}));
+      const {latitude:lat,longitude:lon,accuracy}=pos.coords;
+      if(!Number.isFinite(lat)||!Number.isFinite(lon)||accuracy>250){refuelStatus='El GPS no tiene precisión suficiente. Escribe el nombre de la estación.';return;}
+      refuelStatus='Buscando bencineras cercanas en OpenStreetMap…';updateRefuelFeedback();
+      const query=`[out:json][timeout:12];(node["amenity"="fuel"](around:350,${lat},${lon});way["amenity"="fuel"](around:350,${lat},${lon}););out center;`;
+      const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),14000);
+      let response;
+      try {response=await fetch(`https://overpass.private.coffee/api/interpreter?data=${encodeURIComponent(query)}`,{signal:controller.signal});}
+      finally {clearTimeout(timer);}
+      if(!response.ok)throw new Error('La búsqueda no está disponible. Escribe la estación.');
+      const data=await response.json();
+      const stations=(data.elements||[]).map(item=>{
+        const point=item.center||item,name=(item.tags?.name||item.tags?.brand||item.tags?.operator||'').trim();
+        return {name,distance:kmBetween({lat,lon},{lat:point.lat,lon:point.lon})*1000};
+      }).filter(item=>item.name&&Number.isFinite(item.distance)).sort((a,b)=>a.distance-b.distance);
+      const closest=stations[0],limit=Math.min(250,Math.max(120,accuracy+80));
+      if(!closest || closest.distance>limit){refuelStatus='No pude confirmar una bencinera en tu ubicación. Escribe su nombre.';return;}
+      refuelStation=closest.name.slice(0,80);
+      refuelSuggestedStation=refuelStation;
+      if(input)input.value=refuelStation;
+      refuelStatus=`Sugerencia: ${refuelStation}, a unos ${Math.round(closest.distance)} m. Confirma que sea la estación correcta.`;
+    } catch(error) {
+      refuelStatus=error?.code===1?'No diste permiso al GPS. Puedes escribir la estación.':'No se pudo buscar la estación. Escríbela para continuar.';
+    } finally {refuelLoading=false;updateRefuelFeedback();}
+  }
   async function createRoute(demo=false,keepOrigin=false) {
     if(routeLoading)return;
     if(!navigator.onLine){routeStatus='Sin conexión. Reconéctate e inténtalo de nuevo.';render();return;}
@@ -386,7 +428,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
   }
   function refuelPage() {
     if (vehicle().type!=='fuel') return `<div><h1 class="title" id="page-title" tabindex="-1">No necesitas bencina</h1><p class="lead">Tu vehículo usa ${vehicle().type==='electric'?'electricidad':'energía humana'}.</p></div><button class="btn outline block" data-screen="inicio">Volver al inicio</button>`;
-    return `<div><p class="kicker">Gasto real · ${escapeHtml(vehicle().name)}</p><h1 class="title" id="page-title" tabindex="-1">Registrar carga</h1><p class="lead">Anota cuánto cargaste y pagaste. El precio por litro se calculará solo.</p></div><section class="card"><h2>¿Dónde cargaste?</h2><p class="note" style="margin:8px 0 12px">Escribe la estación donde acabas de cargar.</p><form id="refuel-form" class="signup-form" style="margin-top:16px"><label for="refuel-station">Estación</label><input id="refuel-station" name="station" autocomplete="off" maxlength="80" placeholder="Ej.: Copec, Providencia" value="${escapeHtml(refuelStation)}" required><label for="refuel-grade">Octanaje cargado</label><select id="refuel-grade" name="grade" required>${['93','95','97'].map(g=>`<option value="${g}" ${state.settings.fuelGrade===g?'selected':''}>${g} octanos</option>`).join('')}</select><label for="refuel-liters">Litros cargados</label><input id="refuel-liters" name="liters" inputmode="decimal" type="number" min="0.1" max="200" step="0.01" placeholder="Ej.: 8,5" required><label for="refuel-amount">Total pagado ($)</label><input id="refuel-amount" name="amount" inputmode="numeric" type="number" min="100" max="1000000" step="1" placeholder="Ej.: 11000" required><p class="note">Se guardará como gasto real. En el análisis de pedidos el combustible sigue siendo estimado por km; no se descuenta 2 veces.</p><button class="btn primary block" type="button" data-action="refuel-save">Guardar carga</button></form></section><button class="btn outline block" data-screen="inicio">Volver al inicio</button>`;
+    return `<div><p class="kicker">Gasto real · ${escapeHtml(vehicle().name)}</p><h1 class="title" id="page-title" tabindex="-1">Registrar carga</h1><p class="lead">Anota cuánto cargaste y pagaste. El precio por litro se calculará solo.</p></div><section class="card"><h2>¿Dónde cargaste?</h2><p class="note" style="margin:8px 0 12px" role="status" data-refuel-status>${escapeHtml(refuelStatus)}</p><button class="btn outline block" data-action="refuel-gps" ${refuelLoading?'disabled aria-busy="true"':''}>${refuelLoading?'Buscando estación…':'Buscar con mi GPS'}</button><p class="note" style="margin-top:9px">Solo al tocar este botón se consulta OpenStreetMap con tu ubicación. La sugerencia se puede cambiar.</p><form id="refuel-form" class="signup-form" style="margin-top:16px"><label for="refuel-station">Estación <span class="note">(confirma la sugerencia)</span></label><input id="refuel-station" name="station" autocomplete="off" maxlength="80" placeholder="Ej.: Copec, Providencia" value="${escapeHtml(refuelStation)}" required><label for="refuel-grade">Octanaje cargado</label><select id="refuel-grade" name="grade" required>${['93','95','97'].map(g=>`<option value="${g}" ${state.settings.fuelGrade===g?'selected':''}>${g} octanos</option>`).join('')}</select><label for="refuel-liters">Litros cargados</label><input id="refuel-liters" name="liters" inputmode="decimal" type="number" min="0.1" max="200" step="0.01" placeholder="Ej.: 8,5" required><label for="refuel-amount">Total pagado ($)</label><input id="refuel-amount" name="amount" inputmode="numeric" type="number" min="100" max="1000000" step="1" placeholder="Ej.: 11000" required><p class="note">Se guardará como gasto real. En el análisis de pedidos el combustible sigue siendo estimado por km; no se descuenta 2 veces.</p><button class="btn primary block" type="button" data-action="refuel-save">Guardar carga</button></form></section><button class="btn outline block" data-screen="inicio">Volver al inicio</button>`;
   }
   function security() { return `<div class="security" role="alertdialog" aria-modal="true" aria-labelledby="security-title" aria-describedby="security-desc"><div class="sec-card"><span class="sec-icon">${icon('shield','lg')}</span><h2 id="security-title">Primero, detente</h2><p id="security-desc">Sobre 10 km/h bloqueamos los botones. Tu seguridad va primero.</p><div class="sec-speed">${state.speed}<small>km/h</small></div><button class="btn lime big block" data-action="stop">Simular detención</button><p>Control simulado: no usa GPS.</p></div></div>`; }
   function render() {
@@ -501,6 +543,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     }
     if(action==='shift-start') { if(!state.connected.length){screen='vehiculo';render();toast('Activa una plataforma de ejemplo.',true);return;}state.shiftActive=true;state.nextOfferAt=Date.now()+6000;save();render();toast('Turno de demostración iniciado.');return; }
     if(action==='shift-pause') { state.shiftActive=false;save();render();toast('Turno en pausa.');return; }
+    if(action==='refuel-gps') { lookupRefuelStation();return; }
     if(action==='refuel-save') {
       if(vehicle().type!=='fuel')return;
       const form=document.getElementById('refuel-form');if(!form?.reportValidity())return;
@@ -509,7 +552,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
       const unitPrice=Math.round(amount/liters);
       if(station.length<2||station.length>80||!Number.isFinite(liters)||liters<0.1||liters>200||!Number.isInteger(amount)||amount<100||amount>1000000||unitPrice<100||unitPrice>5000||!['93','95','97'].includes(grade)){toast('Revisa la estación, los litros y el total pagado.',true);return;}
       state.refuels.push({id:`fuel-${Date.now()}`,at:new Date().toISOString(),station,liters,amount,unitPrice,grade,vehicle:vehicle().name});
-      state.settings.fuelGrade=grade;state.settings.fuelPrice=unitPrice;state.settings.fuelPriceManual=true;refuelStation='';screen='inicio';save();render();toast(`Carga guardada: ${money(amount)} · ${money(unitPrice)}/l.`);return;
+      state.settings.fuelGrade=grade;state.settings.fuelPrice=unitPrice;state.settings.fuelPriceManual=true;refuelStation='';refuelSuggestedStation='';refuelStatus='Busca una estación cercana con tu GPS o escribe su nombre.';screen='inicio';save();render();toast(`Carga guardada: ${money(amount)} · ${money(unitPrice)}/l.`);return;
     }
     if(action==='simulate'){simulate();return;}
     if(action==='accept'){acceptedOffer=currentOffer;acceptedCalc=calculateOffer(currentOffer,vehicle(),state.settings);currentOffer=null;waitStart=0;save();render();toast('Pedido aceptado. Marca tu llegada al local para medir la espera.');return;}

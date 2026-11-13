@@ -1,4 +1,4 @@
-const CACHE = 'ultima-milla-v9';
+const CACHE = 'ultima-milla-v10';
 const ASSETS = ['./', './index.html', './style.css', './calc.js', './route-map.js', './app.js', './fuel-prices.json', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
 const ROOT = new URL('./', self.location.href);
 
