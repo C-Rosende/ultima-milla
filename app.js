@@ -7,7 +7,7 @@
   const LUIS = globalThis.DATOS?.luis?.cifras || { espera_min:110, pedidos:19 };
   if (new URLSearchParams(location.search).get('embebido') === '1') document.body.classList.add('embedded');
   if (DIRECT === 'resumen' && new URLSearchParams(location.search).get('compacto') === '1') document.body.classList.add('compact-summary');
-  const SCREENS = ['inicio', 'oferta', 'resumen', 'mapa', 'vehiculo', 'carga'];
+  const SCREENS = ['inicio', 'oferta', 'resultado', 'resumen', 'mapa', 'vehiculo', 'carga'];
   const MONEY = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 });
   const VEHICLES = [
     { id:'cb190', group:'Moto', name:'Honda CB190R', type:'fuel', consumption:35, maintenance:57, investment:2850000, icon:'🏍', unit:'km/l' },
@@ -97,7 +97,7 @@
     }
     return jobs;
   }
-  function defaults() { return { onboarded:false, profile:null, connected:[], vehicleId:'cb190', customVehicle:null, settings:{fuelGrade:'93',priceZone:'Metropolitana',fuelPrice:1300,fuelPriceManual:false,kwhPrice:220,batteryKwh:0,chargeKw:2,chargeStart:20,chargeEnd:80,navApp:'waze',dataMonthly:12000,hoursMonthly:200,goal:5000,investment:2850000}, jobs:[], refuels:[], shiftActive:false, nextOfferAt:0, speed:0, offerCursor:0, pendingOffer:null, activeDelivery:null }; }
+  function defaults() { return { onboarded:false, profile:null, connected:[], vehicleId:'cb190', customVehicle:null, settings:{fuelGrade:'93',priceZone:'Metropolitana',fuelPrice:1300,fuelPriceManual:false,kwhPrice:220,batteryKwh:0,chargeKw:2,chargeStart:20,chargeEnd:80,navApp:'waze',dataMonthly:12000,hoursMonthly:200,goal:5000,investment:2850000}, jobs:[], refuels:[], shiftActive:false, nextOfferAt:0, speed:0, offerCursor:0, pendingOffer:null, activeDelivery:null, lastOutcomeId:null }; }
   function load() {
     if (DEMO || DIRECT) return { ...defaults(), jobs:seedHistory() };
     try {
@@ -118,6 +118,8 @@
   let waitStart = state.activeDelivery?.startedAt || 0;
   let acceptedOffer = state.activeDelivery?.offer || null;
   let acceptedCalc = state.activeDelivery?.calc || null;
+  let deliveryStage = state.activeDelivery?.stage || (waitStart ? 'arrived' : 'accepted');
+  let measuredWaitMin = state.activeDelivery?.measuredWaitMin ?? null;
   let fuelPrices = null;
   let priceZone = state.settings.priceZone;
   let online = navigator.onLine;
@@ -154,7 +156,7 @@
   let demoTimers = [];
   let lastScreen = null;
   if (DIRECT) { state.onboarded = true; state.connected = ['Uber Eats','PedidosYa','Rappi']; if (DIRECT==='oferta') { currentOffer={...OFFERS[0]}; state.offerCursor=1; } }
-  function save() { if (DEMO || DIRECT) return; try { const {speed,...stored}=state; stored.pendingOffer=currentOffer; stored.activeDelivery=acceptedOffer?{offer:acceptedOffer,calc:acceptedCalc,startedAt:waitStart}:null; localStorage.setItem(KEY,JSON.stringify(stored)); } catch (_) {} }
+  function save() { if (DEMO || DIRECT) return; try { const {speed,...stored}=state; stored.pendingOffer=currentOffer; stored.activeDelivery=acceptedOffer?{offer:acceptedOffer,calc:acceptedCalc,startedAt:waitStart,stage:deliveryStage,measuredWaitMin}:null; localStorage.setItem(KEY,JSON.stringify(stored)); } catch (_) {} }
   function toast(message,error=false) {
     document.querySelector('.toast')?.remove();
     const el = document.createElement('div'); el.className=error?'toast error':'toast'; el.textContent=message; (app.querySelector('.toast-region')||app).appendChild(el);
@@ -202,7 +204,7 @@
   function shell(content) {
     if (screen==='inicio') {
       if(state.profile?.name) content=content.replace('Hola, Luis.',`Hola, ${escapeHtml(state.profile.name.split(/\s+/)[0])}.`);
-      content=content.replace('</section><div class="decide">',`</section>${shiftCard()}<div class="decide">`);
+      content=content.replace('</section><div class="decide">',`</section>${shiftCard()}${state.lastOutcomeId?'<button class="last-result" data-screen="resultado">Ver último resultado <span aria-hidden="true">→</span></button>':''}<div class="decide">`);
       content=content.replace('</section><section><div class="section-head"><h2>Actividad reciente',`</section>${refuelSummary()}<section><div class="section-head"><h2>Actividad reciente`);
     }
     if(screen==='vehiculo') {
@@ -210,6 +212,7 @@
       content=settingsExtras()+page.replace('</section>',`</section>${customVehicleEditor()}`);
     }
     if(screen==='resumen') content+=fuelLedger();
+    if(screen==='resultado') content=content.replace('<div class="result-actions">',`${platformComparison()}<div class="result-actions">`);
     content=content.replace('Si cargas a otro precio, escríbelo en Ajustes. El GPS de esta demo solo sirve para rutas en Santiago; no detecta la estación.','Al registrar una carga, el precio real por litro actualiza tus próximos cálculos.');
     content=content.replace('El GPS se usa solo cuando pides una ruta o buscas una estación.','El GPS se usa solo cuando creas una ruta o buscas una estación.');
     return `<div class="shell" ${state.speed>10?'inert':''}><a class="skip-link" href="#main">Ir al contenido</a>${head()}<main class="scroll" id="main" tabindex="-1"><div class="${lastScreen!==screen?'enter ':''}stack">${incomingBanner()}${content}</div></main>${nav()}</div>${state.speed>10?security():''}<div class="toast-region" role="status" aria-live="polite"></div>`;
@@ -257,13 +260,25 @@
     const recent = state.jobs.slice(-4).reverse();
     return `<div><p class="kicker">Tu turno · ${new Date().toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'})}</p><h1 class="title" id="page-title" tabindex="-1">Hola, Luis.</h1><p class="lead">Así va tu día en Santiago.</p></div><section class="hero deco" aria-label="Ganancia neta de hoy"><p class="label">Te queda hoy</p><div class="money" data-count="${Math.round(totals.net)}">${money(totals.net)}</div><p class="sub">Después de ${money(totals.fuel+totals.maintenance+totals.data)} en costos</p><dl class="hero-stats"><div><dt>Por hora</dt><dd>${money(totals.hourly)}</dd></div><div><dt>Pedidos</dt><dd>${jobs.length}</dd></div><div><dt>Sin pedido</dt><dd>${totals.emptyKm.toFixed(1)} km</dd></div></dl></section><div class="decide"><button class="btn lime" data-action="simulate">Simular oferta</button><button class="btn outline" data-screen="resumen">Ver resumen ${icon('arrow','sm')}</button></div><section><div class="section-head"><h2>Plataformas</h2><span class="aside">Conexión simulada</span></div><div class="chips">${['Uber Eats','PedidosYa','Rappi'].map(p=>`<span class="chip ${state.connected.includes(p)?'':'off'}">${logo(p)}${p}</span>`).join('')}</div></section><section><div class="section-head"><h2>Actividad reciente</h2><button class="btn link" data-screen="resumen">Ver todo</button></div><div class="card">${recent.length?recent.map(j=>`<div class="row"><span class="dot ${j.status==='rejected'?'red':'green'}"></span><span class="main"><span class="t1">${j.platform}</span> <span class="t2">${j.status==='rejected'?'Oferta rechazada':j.restaurant} · ${j.date===today()?'Hoy':j.date.slice(5)}</span></span><span class="amt ${j.status==='rejected'?'neg':''}">${j.status==='rejected'?'Rechazada':money(j.net)}</span></div>`).join(''):'<div class="empty"><h2>Aún no hay entregas</h2><p>Cuando completes una, aparecerá aquí.</p></div>'}</div></section><p class="note center">Cifras de demostración. No recibe ofertas reales.</p>`;
   }
+  function deliveryActions() {
+    const steps=[['accepted','Aceptado'],['arrived','En el local'],['picked','En camino']];
+    const active=steps.findIndex(([stage])=>stage===deliveryStage);
+    const detail=deliveryStage==='accepted'
+      ? 'Ve al local. Al llegar, inicia la medición de espera.'
+      : deliveryStage==='arrived'
+        ? 'La espera se mide hasta que retires el pedido.'
+        : 'Pedido retirado. Registra la entrega al llegar al destino.';
+    const action=deliveryStage==='accepted'?'start-wait':deliveryStage==='arrived'?'pickup-order':'finish-delivery';
+    const label=deliveryStage==='accepted'?'Llegué al local':deliveryStage==='arrived'?'Retiré el pedido':'Entregué el pedido';
+    return `<section class="card journey" aria-label="Estado del pedido"><p class="kicker">PEDIDO EN CURSO · DEMO</p><ol class="journey-steps">${steps.map(([stage,name],i)=>`<li class="${i<active?'done':i===active?'active':''}"><span aria-hidden="true">${i<active?'✓':i+1}</span><b>${name}</b></li>`).join('')}</ol><p class="journey-detail">${detail}</p>${deliveryStage==='arrived'?`<p class="journey-timer">Espera medida <strong id="wait-timer">00:00</strong></p>`:deliveryStage==='picked'?`<p class="note">Espera en el local: ${measuredWaitMin} min medidos.</p>`:''}<button class="btn accept big block" data-action="${action}">${label}</button><button class="btn outline block" data-screen="mapa">Ver mapa de prueba</button><p class="note">El mapa muestra un retiro ilustrativo, no el destino de este pedido.</p></section>`;
+  }
   function offerPage() {
     if (!currentOffer && !acceptedOffer) return `<div><p class="kicker">Decide con tus números</p><h1 class="title" id="page-title" tabindex="-1">¿Me conviene?</h1><p class="lead">Mira lo que te quedaría antes de aceptar.</p></div><div class="card empty"><span class="empty-ic">${icon('offer','lg')}</span><h2>No hay ofertas por ahora</h2><p>Prueba con una oferta de ejemplo.</p><button class="btn primary" data-action="simulate">Simular oferta</button></div><p class="note center">La interacción se bloquea sobre 10 km/h.</p>`;
     const o = currentOffer || acceptedOffer;
     const calc = acceptedOffer ? acceptedCalc : calculateOffer(o,vehicle(),state.settings);
     const ratio=Math.max(0,Math.min(100,calc.hourly/state.settings.goal*70));
     const costs=Math.max(0,calc.cost), base=Math.max(calc.gross,1);
-return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'} · ${o.platform}</p><h1 class="title" id="page-title" tabindex="-1">¿Me conviene?</h1><p class="lead">${o.from} → ${o.to} · ${o.restaurant}</p></div><div class="card offer-top"><div class="tl on-${calc.signal} ${acceptedOffer?'':'fresh'}" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div><div><p class="kicker">Semáforo de tu meta</p><h2>${signalText(calc.signal)}</h2><p class="note">${money(calc.hourly)}/h · meta ${money(state.settings.goal)}/h</p></div></div><div class="verdict ${calc.signal} ${acceptedOffer?'':'fresh'}" role="status"><div class="v-title">${signalText(calc.signal)}</div><p class="v-sub">${calc.signal==='red'?'Por debajo de tu meta por hora':'Calculado con tus costos y el regreso sin pedido.'}</p></div><div class="card"><div class="net-line"><span class="lbl">Te quedaría</span><strong class="big-num ${calc.net<0?'neg':''}" data-count="${Math.round(calc.net)}">${money(calc.net)}</strong></div><p class="note">De ${money(calc.gross)} que paga la plataforma</p><div class="stackbar reveal" role="img" aria-label="Pago: ${money(calc.net)} netos y ${money(costs)} en costos"><span class="s-net" style="width:${Math.max(0,calc.net)/base*100}%"></span><span class="s-fuel" style="width:${calc.fuel/base*100}%"></span><span class="s-wrench" style="width:${calc.maintenance/base*100}%"></span><span class="s-data" style="width:${calc.data/base*100}%"></span></div><ul class="legend"><li><span class="sw net"></span>Neto <b>${money(calc.net)}</b></li><li><span class="sw fuel"></span>${vehicle().type==='human'?'Sin combustible':vehicle().type==='electric'?'Electricidad':'Bencina'} <b>${money(calc.fuel)}</b></li><li><span class="sw wrench"></span>Mantención <b>${money(calc.maintenance)}</b></li><li><span class="sw data"></span>Datos <b>${money(calc.data)}</b></li></ul></div><div class="card"><div class="gauge-head"><span>Pago por hora estimado</span><b>${money(calc.hourly)}/h</b></div><div class="gauge-track"><div class="gauge-fill ${calc.signal} grow" style="width:${ratio}%"></div><span class="goal-mark" style="left:70%"><em>Tu meta</em></span></div><dl class="facts"><div class="fact"><dt>Viaje</dt><dd>${calc.km.toFixed(1)} km</dd></div><div class="fact"><dt>Regreso</dt><dd>${calc.returnKm.toFixed(1)} km</dd></div><div class="fact"><dt>Tiempo total</dt><dd>${calc.totalMinutes} min</dd></div></dl><p class="note" style="margin-top:10px">Tiempo: ${calc.minutes} min de viaje + ${calc.waitMin} min de espera. Distancia: ${calc.totalKm.toFixed(1)} km en total.</p></div>${acceptedOffer?`<div class="card wait"><div class="ring" id="wait-ring"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="bg" cx="50" cy="50" r="42"/><circle class="fg" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264"/></svg><div class="ring-txt"><b id="wait-timer">00:00</b><small>${waitStart?'espera':'sin iniciar'}</small></div></div><p class="wait-msg">${waitStart?'Espera en el local en curso. Al registrar la entrega, reemplazaremos la espera estimada por la medida.':'La espera de la oferta es estimada. Marca tu llegada al local para medirla.'}</p></div>${waitStart?'':'<button class="btn outline block" data-action="start-wait">Marcar llegada al local</button>'}<button class="btn accept big block" data-action="finish-delivery">Registrar entrega</button>`:`<div class="decide ${calc.signal==='red'?'red':''}"><button class="btn reject" data-action="reject">Rechazar</button><button class="btn accept" data-action="accept">Aceptar pedido</button></div><button class="btn outline block" data-screen="mapa">Ver ruta ilustrativa ${icon('arrow','sm')}</button>`}<p class="note center">Estimación de demostración; no recibe ofertas reales.</p>`;
+return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'} · ${o.platform}</p><h1 class="title" id="page-title" tabindex="-1">¿Me conviene?</h1><p class="lead">${o.from} → ${o.to} · ${o.restaurant}</p></div><div class="card offer-top"><div class="tl on-${calc.signal} ${acceptedOffer?'':'fresh'}" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div><div><p class="kicker">Semáforo de tu meta</p><h2>${signalText(calc.signal)}</h2><p class="note">${money(calc.hourly)}/h · meta ${money(state.settings.goal)}/h</p></div></div><div class="verdict ${calc.signal} ${acceptedOffer?'':'fresh'}" role="status"><div class="v-title">${signalText(calc.signal)}</div><p class="v-sub">${calc.signal==='red'?'Por debajo de tu meta por hora':'Calculado con tus costos y el regreso sin pedido.'}</p></div><div class="card"><div class="net-line"><span class="lbl">Te quedaría</span><strong class="big-num ${calc.net<0?'neg':''}" data-count="${Math.round(calc.net)}">${money(calc.net)}</strong></div><p class="note">De ${money(calc.gross)} que paga la plataforma</p><div class="stackbar reveal" role="img" aria-label="Pago: ${money(calc.net)} netos y ${money(costs)} en costos"><span class="s-net" style="width:${Math.max(0,calc.net)/base*100}%"></span><span class="s-fuel" style="width:${calc.fuel/base*100}%"></span><span class="s-wrench" style="width:${calc.maintenance/base*100}%"></span><span class="s-data" style="width:${calc.data/base*100}%"></span></div><ul class="legend"><li><span class="sw net"></span>Neto <b>${money(calc.net)}</b></li><li><span class="sw fuel"></span>${vehicle().type==='human'?'Sin combustible':vehicle().type==='electric'?'Electricidad':'Bencina'} <b>${money(calc.fuel)}</b></li><li><span class="sw wrench"></span>Mantención <b>${money(calc.maintenance)}</b></li><li><span class="sw data"></span>Datos <b>${money(calc.data)}</b></li></ul></div><div class="card"><div class="gauge-head"><span>Pago por hora estimado</span><b>${money(calc.hourly)}/h</b></div><div class="gauge-track"><div class="gauge-fill ${calc.signal} grow" style="width:${ratio}%"></div><span class="goal-mark" style="left:70%"><em>Tu meta</em></span></div><dl class="facts"><div class="fact"><dt>Viaje</dt><dd>${calc.km.toFixed(1)} km</dd></div><div class="fact"><dt>Regreso</dt><dd>${calc.returnKm.toFixed(1)} km</dd></div><div class="fact"><dt>Tiempo total</dt><dd>${calc.totalMinutes} min</dd></div></dl><p class="note" style="margin-top:10px">Tiempo: ${calc.minutes} min de viaje + ${calc.waitMin} min de espera. Distancia: ${calc.totalKm.toFixed(1)} km en total.</p></div>${acceptedOffer?deliveryActions():`<div class="decide ${calc.signal==='red'?'red':''}"><button class="btn reject" data-action="reject">Rechazar</button><button class="btn accept" data-action="accept">Aceptar pedido</button></div><button class="btn outline block" data-screen="mapa">Ver ruta ilustrativa ${icon('arrow','sm')}</button>`}<p class="note center">Estimación de demostración; no recibe ofertas reales.</p>`;
   }
   function aggregate(jobs) {
     const accepted = jobs.filter(j=>j.status==='completed');
@@ -313,6 +328,21 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     const max=Math.max(1,...platformSums.map(x=>x.net));
     const spent=t.fuel+t.maintenance+t.data,{investment,net:recoveredNet,remaining,progress}=recovery();
     return `<div><p class="kicker">Tu plata, sin vueltas</p><h1 class="title" id="page-title" tabindex="-1">Resumen</h1><p class="lead">Datos de ${label}. ${period==='día'?'Caso de Luis · cifras de demostración.':'Historial ilustrativo de 30 días.'}</p></div><div class="seg" role="group" aria-label="Período">${[['día','Día'],['semana','Semana'],['mes','Mes']].map(([id,label])=>`<button data-period="${id}" aria-pressed="${period===id}">${label}</button>`).join('')}</div><section class="card"><h2>Lo que queda</h2><div class="eq-row"><span>Ganado bruto</span><b data-count="${Math.round(t.gross)}">${money(t.gross)}</b></div><div class="eq-row minus"><span>Bencina o electricidad</span><b>−${money(t.fuel)}</b></div><div class="eq-row minus"><span>Mantención</span><b>−${money(t.maintenance)}</b></div><div class="eq-row minus"><span>Datos móviles</span><b>−${money(t.data)}</b></div><div class="eq-row eq-total ${t.net<0?'neg':''}"><span>Ganancia neta</span><b data-count="${Math.round(t.net)}">${money(t.net)}</b></div><div class="splitbar" role="img" aria-label="${money(t.net)} netos de ${money(t.gross)} brutos"><span class="keep" style="width:${t.gross?Math.max(0,t.net/t.gross*100):0}%"></span><span class="spent" style="width:${t.gross?Math.max(0,spent/t.gross*100):0}%"></span></div><p class="note">Neto = bruto − bencina o electricidad − mantención − datos.</p></section><div class="stats"><dl class="stat"><dt>Horas trabajadas</dt><dd>${t.realHours.toLocaleString('es-CL',{maximumFractionDigits:1})} h</dd></dl><dl class="stat"><dt>Ganancia por hora</dt><dd>${money(t.hourly)}<small>/h</small></dd></dl><dl class="stat"><dt>Pedidos entregados</dt><dd>${t.count}</dd></dl><dl class="stat"><dt>Km sin pedido</dt><dd>${t.emptyKm.toFixed(1)} km</dd></dl></div><section class="card"><h2>En qué se fue</h2><div class="rows"><div><span class="lbl"><i class="sw fuel"></i>Bencina o electricidad</span><b>${money(t.fuel)}</b></div><div><span class="lbl"><i class="sw wrench"></i>Mantención</span><b>${money(t.maintenance)}</b></div><div><span class="lbl"><i class="sw data"></i>Datos móviles</span><b>${money(t.data)}</b></div><div class="total"><span class="lbl">Gastado total</span><b>${money(spent)}</b></div></div></section><section class="card"><h2>Invertido en el vehículo</h2><dl class="inv-grid"><div><dt>Inversión</dt><dd>${money(investment)}</dd></div><div><dt>Neto acumulado</dt><dd>${money(recoveredNet)}</dd></div><div><dt>Por recuperar*</dt><dd>${money(remaining)}</dd></div></dl><div class="progress grow"><span style="width:${progress}%"></span></div><p class="note" style="margin-top:10px">* Comparación ilustrativa. No equivale a amortización contable.</p></section><section class="card"><h2>Ganancia por día</h2>${chart(jobs)}</section><section class="card"><h2>Por plataforma</h2>${platformSums.map(x=>`<div class="plat"><span class="pname">${x.p}</span><div class="pbar"><span style="width:${Math.max(0,x.net/max*100)}%"></span></div><span class="amt">${money(x.net)}</span></div>`).join('')}</section><p class="note center">${t.rejected} ofertas rechazadas · ${Math.round(t.waitMin)} min de espera estimada o medida. Cifras de demostración.</p>`;
+  }
+  function platformComparison() {
+    const rows=['Uber Eats','PedidosYa','Rappi'].map(name=>{
+      const jobs=state.jobs.filter(job=>job.status==='completed'&&job.platform===name);
+      return {name,count:jobs.length,net:aggregate(jobs).net};
+    });
+    return `<section class="card platform-comparison"><h2>¿Qué plataforma te rindió más?</h2><p class="note">Solo tus entregas guardadas en este teléfono.</p>${rows.map(row=>`<div class="eq-row"><span>${escapeHtml(row.name)} <small>· ${row.count} ${row.count===1?'entrega':'entregas'}</small></span><b>${money(row.net)}</b></div>`).join('')}<p class="note">El total depende de cuántos pedidos hiciste; no predice la próxima oferta.</p></section>`;
+  }
+  function resultPage() {
+    const job=state.jobs.find(j=>j.id===state.lastOutcomeId);
+    if(!job)return `<div><h1 class="title" id="page-title" tabindex="-1">Sin resultado</h1><p class="lead">Completa o rechaza una oferta de prueba para ver el cierre.</p></div><button class="btn primary block" data-action="simulate">Simular oferta</button>`;
+    const completed=job.status==='completed';
+    const platformJobs=state.jobs.filter(j=>j.status==='completed'&&j.platform===job.platform);
+    const platformTotals=aggregate(platformJobs);
+    return `<div class="result-heading"><p class="kicker">SIMULACIÓN · ${escapeHtml(job.platform)}</p><h1 class="title" id="page-title" tabindex="-1">${completed?'Pedido entregado':'Oferta rechazada'}</h1><p class="lead">${escapeHtml(job.restaurant)} · ${job.time}</p></div>${completed?`<section class="result-hero" aria-label="Resultado de la entrega"><span>Te quedaría por esta entrega</span><strong>${money(job.net)}</strong><p>Pago ${money(job.gross)} · costos estimados ${money(job.fuel+job.maintenance+job.data)}</p></section><section class="card"><h2>Así se calcula</h2><div class="eq-row"><span>Pago de la plataforma</span><b>${money(job.gross)}</b></div><div class="eq-row minus"><span>${job.fuelLabel||'Bencina o electricidad'}</span><b>−${money(job.fuel)}</b></div><div class="eq-row minus"><span>Mantención</span><b>−${money(job.maintenance)}</b></div><div class="eq-row minus"><span>Datos móviles</span><b>−${money(job.data)}</b></div><div class="eq-row eq-total"><span>Neto estimado</span><b>${money(job.net)}</b></div></section><section class="result-facts"><div><span>Tiempo total</span><b>${job.totalMinutes} min</b><small>estimado</small></div><div><span>Espera en local</span><b>${job.waitMin} min</b><small>${job.waitSource||'estimada'}</small></div><div><span>Distancia total</span><b>${job.totalKm.toLocaleString('es-CL',{maximumFractionDigits:1})} km</b><small>estimada</small></div></section>`:`<section class="card result-rejected"><h2>No se registró ganancia</h2><p>La oferta se rechazó. Habría dejado ${money(job.projectedNet)} netos estimados (${money(job.projectedHourly)}/h), según los costos configurados al decidir.</p><p class="note">Rechazar no garantiza que llegue otra oferta mejor.</p></section>`}<section class="card"><h2>${escapeHtml(job.platform)} en tu historial</h2><div class="eq-row"><span>Entregas registradas</span><b>${platformJobs.length}</b></div><div class="eq-row"><span>Neto acumulado</span><b>${money(platformTotals.net)}</b></div><div class="eq-row"><span>Promedio por entrega</span><b>${platformJobs.length?money(platformTotals.net/platformJobs.length):'—'}</b></div><p class="note">Solo incluye las entregas guardadas en este navegador. No hay sincronización con ${escapeHtml(job.platform)}.</p></section><div class="result-actions"><button class="btn primary block" data-screen="resumen">Ver resumen completo</button><button class="btn outline block" data-action="simulate">Probar otra oferta</button></div>`;
   }
   function routeMap() {
     if(!routeData)return '<div class="route-empty"><b>↗</b><strong>El mapa aparecerá aquí</strong><span>Usa tu GPS o prueba con un origen de ejemplo.</span></div>';
@@ -435,7 +465,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     if (screen==='carga' && vehicle().type!=='fuel') screen='vehiculo';
     const oldScroll=document.getElementById('main')?.scrollTop||0;
     const changed=lastScreen!==screen;
-    const markup=!state.onboarded?onboarding():shell(({inicio:home,oferta:offerPage,resumen:summary,mapa:routePage,vehiculo:vehiclePage,carga:refuelPage})[screen]());
+    const markup=!state.onboarded?onboarding():shell(({inicio:home,oferta:offerPage,resultado:resultPage,resumen:summary,mapa:routePage,vehiculo:vehiclePage,carga:refuelPage})[screen]());
     app.innerHTML=markup.replace(/(\d+)\.(\d+)(?=\s*km\b)/g,'$1,$2');
     const main=document.getElementById('main');
     const customForm=document.getElementById('custom-vehicle-form');
@@ -497,17 +527,20 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     toast(`Nueva oferta de ejemplo: ${currentOffer.platform}`);
   }
   function finishDelivery() {
-    if(!acceptedOffer)return;
-    const observed=waitStart>0;
-    const waitMin=observed?Math.max(0,Math.round((Date.now()-waitStart)/60000)):acceptedOffer.waitMin;
+    if(!acceptedOffer || deliveryStage!=='picked')return;
+    const observed=measuredWaitMin!==null;
+    const waitMin=observed?measuredWaitMin:acceptedOffer.waitMin;
     const calc=calculateOffer({...acceptedOffer,waitMin},vehicle(),state.settings);
-    state.jobs.push({id:`live-${Date.now()}`,date:today(),time:new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'}),platform:acceptedOffer.platform,restaurant:acceptedOffer.restaurant,from:acceptedOffer.from,to:acceptedOffer.to,status:'completed',waitSource:observed?'medida':'estimada',...calc});
-    acceptedOffer=null;acceptedCalc=null;currentOffer=null;waitStart=0;screen='inicio';scheduleNextOffer();save();render();toast('Entrega de demostración registrada.');
+    const job={id:`live-${Date.now()}`,date:today(),time:new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'}),platform:acceptedOffer.platform,restaurant:acceptedOffer.restaurant,from:acceptedOffer.from,to:acceptedOffer.to,status:'completed',waitSource:observed?'medida':'estimada',fuelLabel:vehicle().type==='electric'?'Electricidad':vehicle().type==='human'?'Sin combustible':'Bencina',...calc};
+    state.jobs.push(job);state.lastOutcomeId=job.id;
+    acceptedOffer=null;acceptedCalc=null;currentOffer=null;waitStart=0;measuredWaitMin=null;deliveryStage='accepted';screen='resultado';scheduleNextOffer();save();render();
   }
   function rejectOffer() {
     if(!currentOffer)return;
-    state.jobs.push({id:`reject-${Date.now()}`,date:today(),time:new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'}),platform:currentOffer.platform,restaurant:currentOffer.restaurant,status:'rejected',gross:0,net:0,totalKm:0,returnKm:0,waitMin:0,totalMinutes:0,signal:calculateOffer(currentOffer,vehicle(),state.settings).signal,fuel:0,maintenance:0,data:0});
-    currentOffer=null;scheduleNextOffer();save();render();toast('Oferta rechazada y registrada.');
+    const projected=calculateOffer(currentOffer,vehicle(),state.settings);
+    const job={id:`reject-${Date.now()}`,date:today(),time:new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'}),platform:currentOffer.platform,restaurant:currentOffer.restaurant,status:'rejected',gross:0,net:0,totalKm:0,returnKm:0,waitMin:0,totalMinutes:0,signal:projected.signal,projectedNet:projected.net,projectedHourly:projected.hourly,fuel:0,maintenance:0,data:0};
+    state.jobs.push(job);state.lastOutcomeId=job.id;
+    currentOffer=null;screen='resultado';scheduleNextOffer();save();render();
   }
   app.addEventListener('click',e=>{
     const button=e.target.closest('[data-action],[data-screen],[data-period],[data-vehicle],[data-connect]');
@@ -555,8 +588,9 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
       state.settings.fuelGrade=grade;state.settings.fuelPrice=unitPrice;state.settings.fuelPriceManual=true;refuelStation='';refuelSuggestedStation='';refuelStatus='Busca una estación cercana con tu GPS o escribe su nombre.';screen='inicio';save();render();toast(`Carga guardada: ${money(amount)} · ${money(unitPrice)}/l.`);return;
     }
     if(action==='simulate'){simulate();return;}
-    if(action==='accept'){acceptedOffer=currentOffer;acceptedCalc=calculateOffer(currentOffer,vehicle(),state.settings);currentOffer=null;waitStart=0;save();render();toast('Pedido aceptado. Marca tu llegada al local para medir la espera.');return;}
-    if(action==='start-wait'){if(!acceptedOffer||waitStart)return;waitStart=Date.now();save();render();toast('Espera en el local iniciada.');return;}
+    if(action==='accept'){if(!currentOffer)return;acceptedOffer=currentOffer;acceptedCalc=calculateOffer(currentOffer,vehicle(),state.settings);currentOffer=null;waitStart=0;measuredWaitMin=null;deliveryStage='accepted';save();render();toast('Pedido aceptado. Avanza al local.');return;}
+    if(action==='start-wait'){if(!acceptedOffer||deliveryStage!=='accepted')return;waitStart=Date.now();deliveryStage='arrived';save();render();toast('Llegada registrada.');return;}
+    if(action==='pickup-order'){if(!acceptedOffer||deliveryStage!=='arrived')return;measuredWaitMin=waitStart>0?Math.max(0,Math.round((Date.now()-waitStart)/60000)):null;waitStart=0;deliveryStage='picked';save();render();toast('Retiro registrado.');return;}
     if(action==='reject'){rejectOffer();return;}
     if(action==='finish-delivery'){finishDelivery();return;}
     if(action==='speed'){state.speed=15;render();return;}
@@ -575,7 +609,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
       routeZoom=action==='route-fit'?null:Math.max(10,Math.min(18,(routeZoom??fitted)+(action==='route-zoom-in'?1:-1)));
       render();return;
     }
-    if(action==='reset'){if(confirm('¿Borrar el perfil, la configuración y el historial guardados en este navegador?')){try{localStorage.removeItem(KEY)}catch(_){}state=defaults();introStep=0;currentOffer=null;acceptedOffer=null;acceptedCalc=null;waitStart=0;screen='inicio';render();}return;}
+    if(action==='reset'){if(confirm('¿Borrar el perfil, la configuración y el historial guardados en este navegador?')){try{localStorage.removeItem(KEY)}catch(_){}state=defaults();introStep=0;currentOffer=null;acceptedOffer=null;acceptedCalc=null;waitStart=0;measuredWaitMin=null;deliveryStage='accepted';screen='inicio';render();}return;}
   });
   app.addEventListener('change',e=>{
     if(state.speed>10)return;
@@ -618,11 +652,12 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
   if(DEMO && !DIRECT){
     function loop() {
       demoTimers.forEach(clearTimeout);demoTimers=[];
-      state={...defaults(),jobs:seedHistory()};state.onboarded=true;state.connected=['Uber Eats','PedidosYa','Rappi'];introStep=0;currentOffer=null;acceptedOffer=null;acceptedCalc=null;waitStart=0;screen='inicio';render();
+      state={...defaults(),jobs:seedHistory()};state.onboarded=true;state.connected=['Uber Eats','PedidosYa','Rappi'];introStep=0;currentOffer=null;acceptedOffer=null;acceptedCalc=null;waitStart=0;measuredWaitMin=null;deliveryStage='accepted';screen='inicio';render();
       const later=(ms,fn)=>demoTimers.push(setTimeout(fn,ms));
       later(1600,()=>simulate(0));
-      later(4300,()=>{acceptedOffer=currentOffer;acceptedCalc=calculateOffer(currentOffer,vehicle(),state.settings);currentOffer=null;waitStart=Date.now();render();});
+      later(4300,()=>{acceptedOffer=currentOffer;acceptedCalc=calculateOffer(currentOffer,vehicle(),state.settings);currentOffer=null;waitStart=Date.now();deliveryStage='arrived';render();});
       later(6800,()=>{screen='oferta';render();});
+      later(8500,()=>{deliveryStage='picked';waitStart=0;render();});
       later(9200,finishDelivery);
       later(11500,()=>simulate(1));
       later(14400,()=>{rejectOffer();toast('No conviene: está por debajo de tu meta por hora.');});

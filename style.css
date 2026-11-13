@@ -592,13 +592,14 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 /* Barra inferior */
 .tabbar {
   flex: none;
-  display: grid; grid-template-columns: repeat(5, 1fr);
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
   padding: 6px max(env(safe-area-inset-right), 6px) max(env(safe-area-inset-bottom), 8px) max(env(safe-area-inset-left), 6px);
   background: #fff;
   border-top: 1px solid var(--line);
 }
 .tab {
   position: relative;
+  min-width: 0;
   min-height: 52px; border: 0; background: transparent;
   display: grid; justify-items: center; align-content: center; gap: 3px;
   font-size: 13px; font-weight: 600; color: var(--muted);
@@ -708,6 +709,47 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .intro :focus-visible, .hero :focus-visible, .sec-card :focus-visible { outline-color: var(--lime); }
 .title:focus-visible, .intro h1:focus-visible, .sec-card h2:focus-visible, .st:focus-visible { outline: none; }
 
+/* Recorrido de un pedido y cierre de la simulación */
+.last-result {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: 100%; min-height: 48px; padding: 10px 14px;
+  border: 1px solid #a9cda7; border-radius: 14px;
+  background: #eaf5df; color: var(--forest); font-weight: 700; text-align: left;
+}
+.last-result span { font-size: 20px; }
+.journey { border-color: #a9cda7; background: linear-gradient(160deg, #fff 50%, #f1f8e8); }
+.journey .kicker { color: var(--green); font-weight: 750; letter-spacing: .07em; }
+.journey-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin: 18px 0; }
+.journey-steps li { position: relative; display: grid; justify-items: center; align-content: start; gap: 7px; min-width: 0; color: var(--muted); text-align: center; }
+.journey-steps li:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: calc(50% + 18px); width: calc(100% - 36px); height: 2px; background: var(--line-2); }
+.journey-steps li.done:not(:last-child)::after { background: var(--green-fill); }
+.journey-steps li span { display: grid; place-items: center; width: 32px; height: 32px; border: 2px solid var(--line-2); border-radius: 50%; background: #fff; font-size: 14px; font-weight: 750; }
+.journey-steps li.active span { border-color: var(--forest); background: var(--forest); color: #fff; }
+.journey-steps li.done span { border-color: var(--green); background: var(--green); color: #fff; }
+.journey-steps li b { font-size: 12px; line-height: 1.2; font-weight: 650; overflow-wrap: anywhere; }
+.journey-steps li.active b { color: var(--forest); }
+.journey-detail { font-size: 14px; line-height: 1.45; margin-bottom: 14px; }
+.journey-timer { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 10px 12px; margin-bottom: 12px; border-radius: 12px; background: var(--green-soft); font-size: 14px; }
+.journey-timer strong { font-size: 22px; font-variant-numeric: tabular-nums; }
+.journey .btn + .btn { margin-top: 8px; }
+.journey > .note:last-child { margin-top: 10px; }
+.result-heading { padding-top: 4px; }
+.result-hero { border-radius: 22px; padding: 20px; background: var(--forest); color: #fff; overflow-wrap: anywhere; }
+.result-hero span { display: block; color: #cde1d0; font-size: 14px; }
+.result-hero strong { display: block; margin: 4px 0; color: var(--lime); font-size: clamp(34px, 10vw, 46px); line-height: 1.08; letter-spacing: -.03em; }
+.result-hero p { color: #dce8dd; font-size: 13px; line-height: 1.4; }
+.result-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+.result-facts > div { min-width: 0; padding: 12px 9px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
+.result-facts span, .result-facts small { display: block; color: var(--muted); font-size: 11px; line-height: 1.2; }
+.result-facts b { display: block; margin: 6px 0 3px; font-size: 15px; line-height: 1.1; overflow-wrap: anywhere; }
+.result-rejected { border-color: #e2b4af; background: #fff9f8; }
+.result-rejected p { margin-top: 9px; font-size: 14px; line-height: 1.45; }
+.platform-comparison h2 { margin-bottom: 4px; }
+.platform-comparison .eq-row span { min-width: 0; }
+.platform-comparison .eq-row small { color: var(--muted); font-size: 12px; }
+.platform-comparison .note:last-child { margin-top: 10px; }
+.result-actions { display: grid; gap: 8px; }
+
 /* Pantallas bajas y angostas */
 @media (max-height: 680px) {
   .hero { padding: 16px 18px 14px; }
@@ -723,6 +765,7 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
   .ring { width: 92px; height: 92px; }
 }
 @media (max-width: 370px) {
+  .tab { font-size: 11px; }
   .scroll { padding-left: max(env(safe-area-inset-left), 12px); padding-right: max(env(safe-area-inset-right), 12px); }
   .fact dd { font-size: 15px; }
   .veh { padding: 10px; gap: 8px; }
