@@ -20,9 +20,10 @@
     const data = Math.round(totalMinutes / 60 * Math.max(0, Number(settings.dataMonthly) || 0) / Math.max(1, Number(settings.hoursMonthly) || 1));
     const net = gross - fuel - maintenance - data;
     const hourly = net * 60 / totalMinutes;
+    const netPerKm = totalKm > 0 ? net / totalKm : 0;
     const goal = Math.max(1, Number(settings.goal) || 1);
     const signal = hourly >= goal ? 'green' : hourly >= goal * 0.9 ? 'yellow' : 'red';
-    return { gross, km, returnKm, totalKm, minutes, waitMin, totalMinutes, fuel, maintenance, data, cost: fuel + maintenance + data, net, hourly, signal };
+    return { gross, km, returnKm, totalKm, minutes, waitMin, totalMinutes, fuel, maintenance, data, cost: fuel + maintenance + data, net, hourly, netPerKm, signal };
   }
   return { calculateOffer };
 });

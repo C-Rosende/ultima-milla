@@ -241,7 +241,7 @@
       const offer=currentOffer||acceptedOffer;
       const calc=acceptedOffer?acceptedCalc:calculateOffer(offer,vehicle(),state.settings);
       const decision=calc.signal==='green'?'Aceptar':calc.signal==='yellow'?'Revisar antes de aceptar':'Rechazar';
-      content=content.replace('<div class="verdict ',`${offerWaitCard(offer)}<div class="verdict `);
+      content=content.replace('<div class="verdict ',`${offerWaitCard(offer)}<dl class="offer-glance" aria-label="Rentabilidad estimada de un vistazo"><div><dt>Neto por hora</dt><dd>${money(calc.hourly)}<small>/h</small></dd></div><div><dt>Neto por km</dt><dd>${money(calc.netPerKm)}<small>/km</small></dd></div></dl><p class="offer-glance-note">Por km incluye el regreso indicado. Valores estimados, no ingresos garantizados.</p><div class="verdict `);
       if(!acceptedOffer) content=content.replace(`<div class="v-title">${signalText(calc.signal)}</div>`,`<div class="v-title">Recomendación: ${decision}</div>`);
       if(offer.manual) {
         content=content.replace('Nueva oferta · ', 'Tus datos · ');

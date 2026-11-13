@@ -30,3 +30,13 @@ test('un pedido deficitario nunca aparece como conveniente', () => {
   assert.ok(result.net < 0);
   assert.equal(result.signal, 'red');
 });
+
+test('la lectura por km incluye el regreso y no divide por cero', () => {
+  const vehicle = { type: 'human', consumption: 1, maintenance: 0 };
+  const noReturn = calculateOffer({ ...offer, returnKm: 0 }, vehicle, settings);
+  const withReturn = calculateOffer({ ...offer, returnKm: 4 }, vehicle, settings);
+  assert.ok(withReturn.netPerKm < noReturn.netPerKm);
+  const noDistance = calculateOffer({ ...offer, km: 0, returnKm: 0 }, vehicle, settings);
+  assert.equal(noDistance.netPerKm, 0);
+  assert.ok(Number.isFinite(noDistance.netPerKm));
+});
