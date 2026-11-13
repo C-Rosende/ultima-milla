@@ -97,7 +97,7 @@
     }
     return jobs;
   }
-  function defaults() { return { onboarded:false, profile:null, connected:[], vehicleId:'cb190', customVehicle:null, settings:{fuelGrade:'93',priceZone:'Metropolitana',fuelPrice:1300,fuelPriceManual:false,kwhPrice:220,batteryKwh:0,chargeKw:2,chargeStart:20,chargeEnd:80,navApp:'waze',dataMonthly:12000,hoursMonthly:200,goal:5000,investment:2850000}, jobs:[], refuels:[], shiftActive:false, nextOfferAt:0, speed:0, offerCursor:0, pendingOffer:null, activeDelivery:null, lastOutcomeId:null }; }
+  function defaults() { return { onboarded:true, profile:{name:'Luis',email:'luis@demo.example'}, connected:['Uber Eats','PedidosYa','Rappi'], vehicleId:'cb190', customVehicle:null, settings:{fuelGrade:'93',priceZone:'Metropolitana',fuelPrice:1300,fuelPriceManual:false,kwhPrice:220,batteryKwh:0,chargeKw:2,chargeStart:20,chargeEnd:80,navApp:'waze',dataMonthly:12000,hoursMonthly:200,goal:5000,investment:2850000}, jobs:[], refuels:[], shiftActive:false, nextOfferAt:0, speed:0, offerCursor:0, pendingOffer:null, activeDelivery:null, lastOutcomeId:null }; }
   function load() {
     if (DEMO || DIRECT) return { ...defaults(), jobs:seedHistory() };
     try {
@@ -106,7 +106,7 @@
         if (raw.jobs.some(j=>j.id?.startsWith('seed-13-')) && !raw.jobs.some(j=>j.id?.startsWith('seed-14-'))) {
           raw.jobs = [...seedHistory().filter(j=>j.date<dayAgo(13)), ...raw.jobs];
         }
-        return { ...defaults(), ...raw, refuels:Array.isArray(raw.refuels)?raw.refuels:[], settings:{...defaults().settings,...raw.settings}, onboarded: Boolean(raw.onboarded && raw.profile), speed:0 };
+        return { ...defaults(), ...raw, profile:raw.profile?.name?raw.profile:defaults().profile, connected:raw.onboarded&&Array.isArray(raw.connected)?raw.connected:defaults().connected, refuels:Array.isArray(raw.refuels)?raw.refuels:[], settings:{...defaults().settings,...raw.settings}, onboarded:true, speed:0 };
       }
     } catch (_) { /* El prototipo sigue funcionando si el almacenamiento está deshabilitado. */ }
     return defaults();
@@ -271,7 +271,7 @@
   }
   function settingsExtras() {
     const platforms = ['Uber Eats','PedidosYa','Rappi'];
-    return `<div><p class="kicker">Tu espacio de trabajo</p><h1 class="title" id="page-title" tabindex="-1">Ajustes</h1><p class="lead">Controla tu perfil, plataformas de ejemplo y costos.</p></div><section class="card"><h2>Perfil local</h2><form class="signup-form compact" id="profile-form"><label for="profile-name">Nombre</label><input id="profile-name" name="name" required minlength="2" maxlength="40" value="${escapeHtml(state.profile?.name)}"><label for="profile-email">Correo</label><input id="profile-email" name="email" type="email" required maxlength="120" value="${escapeHtml(state.profile?.email)}"><button type="button" class="btn outline block" data-action="save-profile">Guardar perfil</button></form><p class="note">Solo en este dispositivo. No es una cuenta en línea.</p></section><section class="card"><h2>Plataformas de ejemplo</h2><p class="note">Activar una plataforma muestra sus ofertas simuladas. No se conecta a Uber Eats, PedidosYa ni Rappi.</p><div class="connect-list settings-connect">${platforms.map(p=>`<button class="connect" data-connect="${p}" aria-pressed="${state.connected.includes(p)}">${logo(p)}<span><span class="cn">${p}</span><br><span class="cs">Sin acceso a tu cuenta real</span></span><span class="state">${state.connected.includes(p)?'Activo':'Activar'}</span></button>`).join('')}</div></section>`;
+    return `<div><p class="kicker">Tu espacio de trabajo</p><h1 class="title" id="page-title" tabindex="-1">Ajustes</h1><p class="lead">Controla tu perfil, plataformas de ejemplo y costos.</p></div><section class="card"><h2>Perfil local</h2><form class="signup-form compact" id="profile-form"><label for="profile-name">Nombre</label><input id="profile-name" name="name" required minlength="2" maxlength="40" value="${escapeHtml(state.profile?.name)}"><label for="profile-email">Correo</label><input id="profile-email" name="email" type="email" required maxlength="120" value="${escapeHtml(state.profile?.email)}"><button type="button" class="btn outline block" data-action="save-profile">Guardar perfil</button></form><p class="note">Luis y su correo son datos de ejemplo. Este perfil vive solo en este dispositivo; no es una cuenta en línea.</p></section><section class="card"><h2>Plataformas de ejemplo</h2><p class="note">Activar una plataforma muestra sus ofertas simuladas. No se conecta a Uber Eats, PedidosYa ni Rappi.</p><div class="connect-list settings-connect">${platforms.map(p=>`<button class="connect" data-connect="${p}" aria-pressed="${state.connected.includes(p)}">${logo(p)}<span><span class="cn">${p}</span><br><span class="cs">Sin acceso a tu cuenta real</span></span><span class="state">${state.connected.includes(p)?'Activo':'Activar'}</span></button>`).join('')}</div></section>`;
   }
   function customVehicleEditor() {
     const v=state.customVehicle;
@@ -669,7 +669,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
       routeZoom=action==='route-fit'?null:Math.max(10,Math.min(18,(routeZoom??fitted)+(action==='route-zoom-in'?1:-1)));
       render();return;
     }
-    if(action==='reset'){if(confirm('¿Borrar el perfil, la configuración y el historial guardados en este navegador?')){try{localStorage.removeItem(KEY)}catch(_){}state=defaults();introStep=0;currentOffer=null;acceptedOffer=null;acceptedCalc=null;waitStart=0;measuredWaitMin=null;deliveryStage='accepted';screen='inicio';render();}return;}
+    if(action==='reset'){if(confirm('¿Borrar tus cambios y el historial guardados en este navegador? Volverás al perfil de demostración de Luis.')){try{localStorage.removeItem(KEY)}catch(_){}state=defaults();introStep=0;currentOffer=null;acceptedOffer=null;acceptedCalc=null;waitStart=0;measuredWaitMin=null;deliveryStage='accepted';screen='inicio';render();}return;}
   });
   app.addEventListener('change',e=>{
     if(state.speed>10)return;
