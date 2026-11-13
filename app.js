@@ -33,7 +33,30 @@
     { id:'trek', group:'Bicicleta', name:'Trek FX', type:'human', consumption:1, maintenance:25, investment:850000, unit:'sin combustible' },
     { id:'specialized', group:'Bicicleta', name:'Specialized Turbo Vado', type:'electric', consumption:80, maintenance:34, investment:3900000, unit:'km/kWh' },
     { id:'ninebot', group:'Scooter', name:'Segway Ninebot F2', type:'electric', consumption:38, maintenance:28, investment:690000, unit:'km/kWh' },
-    { id:'navee', group:'Scooter', name:'Navee V50', type:'electric', consumption:42, maintenance:29, investment:620000, unit:'km/kWh' }
+    { id:'navee', group:'Scooter', name:'Navee V50', type:'electric', consumption:42, maintenance:29, investment:620000, unit:'km/kWh' },
+    { id:'navi', group:'Moto', name:'Honda Navi 110', type:'fuel', consumption:40, maintenance:48, investment:1850000, unit:'km/l' },
+    { id:'xr150', group:'Moto', name:'Honda XR150L', type:'fuel', consumption:36, maintenance:55, investment:2700000, unit:'km/l' },
+    { id:'boxer', group:'Moto', name:'Bajaj Boxer CT 100', type:'fuel', consumption:47, maintenance:45, investment:1650000, unit:'km/l' },
+    { id:'apache', group:'Moto', name:'TVS Apache RTR 160', type:'fuel', consumption:38, maintenance:52, investment:2350000, unit:'km/l' },
+    { id:'yaris', group:'Auto', name:'Toyota Yaris', type:'fuel', consumption:16, maintenance:90, investment:12500000, unit:'km/l' },
+    { id:'soluto', group:'Auto', name:'Kia Soluto', type:'fuel', consumption:15, maintenance:90, investment:10500000, unit:'km/l' },
+    { id:'accent', group:'Auto', name:'Hyundai Accent', type:'fuel', consumption:15, maintenance:92, investment:11900000, unit:'km/l' },
+    { id:'baleno', group:'Auto', name:'Suzuki Baleno', type:'fuel', consumption:17, maintenance:89, investment:11200000, unit:'km/l' },
+    { id:'onix', group:'Auto', name:'Chevrolet Onix', type:'fuel', consumption:16, maintenance:91, investment:11300000, unit:'km/l' },
+    { id:'celerio', group:'Auto', name:'Suzuki Celerio', type:'fuel', consumption:18, maintenance:86, investment:8900000, unit:'km/l' },
+    { id:'orion', group:'Bicicleta', name:'Oxford Orion', type:'human', consumption:1, maintenance:24, investment:350000, unit:'sin combustible' },
+    { id:'marlin', group:'Bicicleta', name:'Trek Marlin 5', type:'human', consumption:1, maintenance:26, investment:760000, unit:'sin combustible' },
+    { id:'escape', group:'Bicicleta', name:'Giant Escape 3', type:'human', consumption:1, maintenance:24, investment:650000, unit:'sin combustible' },
+    { id:'sirrus', group:'Bicicleta', name:'Specialized Sirrus', type:'human', consumption:1, maintenance:25, investment:900000, unit:'sin combustible' },
+    { id:'quick', group:'Bicicleta', name:'Cannondale Quick 4', type:'human', consumption:1, maintenance:26, investment:950000, unit:'sin combustible' },
+    { id:'turbo', group:'Bicicleta', name:'Specialized Turbo Como', type:'electric', consumption:75, maintenance:35, investment:4200000, unit:'km/kWh' },
+    { id:'mi4', group:'Scooter', name:'Xiaomi Electric Scooter 4', type:'electric', consumption:40, maintenance:28, investment:550000, unit:'km/kWh' },
+    { id:'mipro2', group:'Scooter', name:'Xiaomi Mi Pro 2', type:'electric', consumption:38, maintenance:28, investment:600000, unit:'km/kWh' },
+    { id:'maxg2', group:'Scooter', name:'Segway Ninebot Max G2', type:'electric', consumption:43, maintenance:29, investment:1000000, unit:'km/kWh' },
+    { id:'f2pro', group:'Scooter', name:'Segway Ninebot F2 Pro', type:'electric', consumption:40, maintenance:29, investment:850000, unit:'km/kWh' },
+    { id:'kqi2', group:'Scooter', name:'NIU KQi2 Pro', type:'electric', consumption:39, maintenance:29, investment:750000, unit:'km/kWh' },
+    { id:'kqi3', group:'Scooter', name:'NIU KQi3 Pro', type:'electric', consumption:42, maintenance:30, investment:950000, unit:'km/kWh' },
+    { id:'s65', group:'Scooter', name:'Navee S65', type:'electric', consumption:43, maintenance:30, investment:850000, unit:'km/kWh' }
   ];
   const OFFERS = [
     { id:1, platform:'Uber Eats', gross:6800, km:5.2, returnKm:1.6, minutes:38, waitMin:5, from:'Providencia', to:'Ñuñoa', restaurant:'Verde Limón', pickup:[102,131], drop:[225,222] },
@@ -74,7 +97,7 @@
     }
     return jobs;
   }
-  function defaults() { return { onboarded:false, profile:null, connected:[], vehicleId:'cb190', customVehicle:null, settings:{fuelPrice:1300,kwhPrice:220,dataMonthly:12000,hoursMonthly:200,goal:5000,investment:2850000}, jobs:[], speed:0, offerCursor:0, pendingOffer:null, activeDelivery:null }; }
+  function defaults() { return { onboarded:false, profile:null, connected:[], vehicleId:'cb190', customVehicle:null, settings:{fuelGrade:'93',priceZone:'Metropolitana',fuelPrice:1300,fuelPriceManual:false,kwhPrice:220,batteryKwh:0,chargeKw:2,chargeStart:20,chargeEnd:80,navApp:'waze',dataMonthly:12000,hoursMonthly:200,goal:5000,investment:2850000}, jobs:[], speed:0, offerCursor:0, pendingOffer:null, activeDelivery:null }; }
   function load() {
     if (DEMO || DIRECT) return { ...defaults(), jobs:seedHistory() };
     try {
@@ -83,7 +106,7 @@
         if (raw.jobs.some(j=>j.id?.startsWith('seed-13-')) && !raw.jobs.some(j=>j.id?.startsWith('seed-14-'))) {
           raw.jobs = [...seedHistory().filter(j=>j.date<dayAgo(13)), ...raw.jobs];
         }
-        return { ...defaults(), ...raw, onboarded: Boolean(raw.onboarded && raw.profile), speed:0 };
+        return { ...defaults(), ...raw, settings:{...defaults().settings,...raw.settings}, onboarded: Boolean(raw.onboarded && raw.profile), speed:0 };
       }
     } catch (_) { /* El prototipo sigue funcionando si el almacenamiento está deshabilitado. */ }
     return defaults();
@@ -96,7 +119,7 @@
   let acceptedOffer = state.activeDelivery?.offer || null;
   let acceptedCalc = state.activeDelivery?.calc || null;
   let fuelPrices = null;
-  let priceZone = 'Metropolitana';
+  let priceZone = state.settings.priceZone;
   let online = navigator.onLine;
   const ROUTE_STOPS = [
     { name:'Retiro de ejemplo · Manuel Montt', address:'Av. Providencia 1453', lat:-33.4295, lon:-70.6204 },
@@ -112,12 +135,17 @@
   let routeCursor = -1;
   function loadPrices() {
     fetch('./fuel-prices.json', {cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Sin copia');return r.json();}).then(data=>{
-      if(!Array.isArray(data.zones) || !data.zones.every(z=>Number.isFinite(z.average) && z.average>0)) return;
+      if(!Array.isArray(data.zones) || !data.zones.every(z=>['93','95','97'].every(g=>Number.isFinite(z.prices?.[g]?.average) && z.prices[g].average>0))) return;
       fuelPrices=data;
-      if(screen==='mapa') render();
+      if(!state.settings.fuelPriceManual)syncFuelPrice();
+      if(screen==='mapa'||screen==='vehiculo') render();
     }).catch(()=>{});
   }
   let period = 'día';
+  function syncFuelPrice() {
+    const average=fuelPrices?.zones?.find(z=>z.name===priceZone)?.prices?.[state.settings.fuelGrade]?.average;
+    if(Number.isFinite(average)){state.settings.fuelPrice=Math.round(average);save();}
+  }
   let toastTimer = null;
   let demoTimers = [];
   let lastScreen = null;
@@ -258,13 +286,23 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     const tiles=view.tiles.map(t=>`<image href="https://tile.openstreetmap.org/${t.zoom}/${t.x}/${t.y}.png" x="${t.left.toFixed(1)}" y="${t.top.toFixed(1)}" width="256" height="256"/>`).join('');
     return `<div class="route-map-wrap"><svg class="route-map" viewBox="0 0 350 330" role="img" aria-label="Ruta por calles hacia ${escapeHtml(routeData.stop.address)}"><rect width="350" height="330" fill="#e9eee8"/>${tiles}<path d="${path}" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><path d="${path}" fill="none" stroke="#176b45" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${first.x.toFixed(1)}" cy="${first.y.toFixed(1)}" r="10" fill="#2563a6" stroke="#fff" stroke-width="4"/><circle cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="10" fill="#10251e" stroke="#fff" stroke-width="4"/></svg><div class="route-map-controls"><button data-action="route-zoom-in" aria-label="Acercar mapa">+</button><button data-action="route-zoom-out" aria-label="Alejar mapa">−</button><button data-action="route-fit" aria-label="Ajustar ruta">⌖</button></div><span class="map-attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a></span></div>`;
   }
+  function fuelCard() {
+    const zones=fuelPrices?.zones||[],entry=zones.find(z=>z.name===priceZone)?.prices?.[state.settings.fuelGrade];
+    const date=fuelPrices?.fetchedAt?new Date(fuelPrices.fetchedAt):null,validDate=date&&!Number.isNaN(date.getTime());
+    return `<section class="card"><h2>Bencina para tu vehículo</h2><p class="note">${validDate?`Copia oficial: ${date.toLocaleString('es-CL')} · Bencina en Línea`:'Aún no hay una copia de precios válida.'} ${validDate&&Date.now()-date.getTime()>172800000?'Datos de más de 48 h. Verifica antes de cargar.':''}</p><div class="picker-controls"><label>Octanaje<select data-fuel-grade aria-label="Octanaje">${['93','95','97'].map(g=>`<option value="${g}" ${g===state.settings.fuelGrade?'selected':''}>${g}</option>`).join('')}</select></label><label>Macrozona<select data-price-zone aria-label="Macrozona de precios">${zones.map(z=>`<option value="${escapeHtml(z.name)}" ${z.name===priceZone?'selected':''}>${escapeHtml(z.name)}</option>`).join('')}</select></label></div><div class="price-highlight"><b>${entry?money(entry.average):'—'}/L</b><span>Promedio de la macrozona; no es el precio de la bomba.</span></div><p class="note">Tu cálculo usa ${money(state.settings.fuelPrice)}/L${state.settings.fuelPriceManual?' (precio ingresado por ti)':entry?' (promedio de zona)':' (valor de ejemplo; sin precio zonal)'}. Si cargas a otro precio, escríbelo en Ajustes. El GPS de esta demo solo sirve para rutas en Santiago; no detecta la estación.</p><button class="btn outline block" data-action="apply-price" ${!entry?'disabled':''}>Usar promedio de ${state.settings.fuelGrade} en mis costos</button><a class="btn outline block" href="https://www.bencinaenlinea.cl/" target="_blank" rel="noopener noreferrer">Consultar estación y precio exacto</a></section>`;
+  }
+  function chargeCard() {
+    const s=state.settings,delta=(Number(s.chargeEnd)-Number(s.chargeStart))/100;
+    const energy=Number(s.batteryKwh)*delta/0.9;
+    const hours=energy/Number(s.chargeKw);
+    return `<section class="card"><h2>Tu próxima carga</h2>${s.batteryKwh>0&&delta>0&&s.chargeKw>0?`<div class="charge-summary"><div><b>${money(energy*s.kwhPrice)}</b><span>Costo estimado</span></div><div><b>${hours.toLocaleString('es-CL',{maximumFractionDigits:1})} h</b><span>Tiempo ideal</span></div></div>`:'<p class="note">Indica batería, potencia y porcentajes de carga para calcular costo y tiempo.</p>'}<p class="note">Estimación con 90 % de eficiencia. La carga rápida puede disminuir de velocidad al final; no sustituye el dato del cargador.</p></section>`;
+  }
   function routePage() {
-    const zones=fuelPrices?.zones||[],entry=zones.find(z=>z.name===priceZone);
-    const stamp=fuelPrices?.fetchedAt;
-    const date=stamp?new Date(stamp):null,validDate=date&&!Number.isNaN(date.getTime());
     const eta=routeData?Math.max(1,Math.ceil(routeData.duration/60)):0,stop=routeData?.stop;
-    const navUrl=routeData?`https://www.google.com/maps/dir/?api=1&origin=${routeData.origin.lat},${routeData.origin.lon}&destination=${stop.lat},${stop.lon}&travelmode=driving`:'';
-    return `<div><p class="kicker">Tu trayecto</p><h1 class="title" id="page-title" tabindex="-1">Ruta a un retiro</h1><p class="lead">Una ruta de prueba por calles. El pedido y el retiro son ejemplos.</p></div><section class="card route-card"><div class="route-card-head"><span class="route-badge">RUTA DE PRUEBA</span><span>${online?'Con conexión':'Sin conexión'}</span></div><h2>${stop?escapeHtml(stop.name):'¿Desde dónde partimos?'}</h2><p class="route-address">${stop?escapeHtml(stop.address)+', Providencia':'El punto de retiro se elegirá al crear la ruta.'}</p>${!routeData?`<div class="route-actions"><button class="btn primary" data-action="route-gps" ${routeLoading||!online?'disabled':''}>${routeLoading?'Creando ruta…':'Crear ruta con mi GPS'}</button><button class="btn outline" data-action="route-demo" ${routeLoading||!online?'disabled':''}>Probar sin GPS</button></div>`:''}<p class="route-status" role="status">${escapeHtml(routeStatus)}</p>${routeMap()}${routeData?`<div class="route-metrics"><div><b>${eta} min</b><span>ETA base, sin tráfico</span></div><div><b>${(routeData.distance/1000).toLocaleString('es-CL',{maximumFractionDigits:1})} km</b><span>Por calles</span></div></div><label class="route-wait">Espera que tú observes <small>Opcional, no en vivo</small><select data-route-wait aria-label="Espera observada en el local">${[0,5,10,15,20].map(n=>`<option value="${n}" ${routeWait===n?'selected':''}>${n} min</option>`).join('')}</select></label><p class="route-total">Llegada + espera indicada <b>${eta+routeWait} min</b></p><div class="route-actions"><button class="btn outline" data-action="route-another">Otro retiro</button><a class="btn primary" href="${navUrl}" target="_blank" rel="noopener noreferrer">Abrir navegación</a></div><p class="note">Abrir navegación comparte origen y destino con Google. La ruta es vial para auto: no incluye tacos ni espera real; no está validada para bicicleta o scooter.</p>`:`<p class="note">Al crear la ruta se consulta un servicio externo con origen y destino. El mapa usa OpenStreetMap. Tu ubicación no se guarda en el perfil.</p>`}</section><section class="card"><h2>Gasolina 93 por zona</h2><p class="note">${validDate?`Última copia: ${date.toLocaleString('es-CL')} · fuente: Bencina en Línea`:'Todavía no hay copia de precios disponible.'} ${validDate&&Date.now()-date.getTime()>172800000?'Datos de más de 48 h; verifica antes de cargar.':''}</p>${zones.length?`<label class="zone-label">Zona<select data-price-zone aria-label="Zona de precios">${zones.map(z=>`<option ${z.name===priceZone?'selected':''}>${escapeHtml(z.name)}</option>`).join('')}</select></label><div class="price-highlight"><b>${entry?money(entry.average):'—'}</b><span>promedio por litro, no precio de una estación</span></div><button class="btn outline block" data-action="apply-price" ${!entry?'disabled':''}>Usar promedio en mis cálculos</button>`:''}<a class="btn outline block" href="https://www.bencinaenlinea.cl/" target="_blank" rel="noopener noreferrer">Verificar precios por estación</a></section>`;
+    const navUrl=routeData?(state.settings.navApp==='waze'
+      ?`https://waze.com/ul?ll=${stop.lat}%2C${stop.lon}&navigate=yes`
+      :`https://www.google.com/maps/dir/?api=1&origin=${routeData.origin.lat}%2C${routeData.origin.lon}&destination=${stop.lat}%2C${stop.lon}&travelmode=${vehicleGroup(vehicle())==='Bicicleta'?'bicycling':'driving'}`):'';
+    return `<div><p class="kicker">Tu trayecto</p><h1 class="title" id="page-title" tabindex="-1">Ruta a un retiro</h1><p class="lead">Una ruta de prueba por calles. El pedido y el retiro son ejemplos.</p></div><section class="card route-card"><div class="route-card-head"><span class="route-badge">RUTA DE PRUEBA</span><span>${online?'Con conexión':'Sin conexión'}</span></div><h2>${stop?escapeHtml(stop.name):'¿Desde dónde partimos?'}</h2><p class="route-address">${stop?escapeHtml(stop.address)+', Providencia':'El punto de retiro se elegirá al crear la ruta.'}</p>${!routeData?`<div class="route-actions"><button class="btn primary" data-action="route-gps" ${routeLoading||!online?'disabled':''}>${routeLoading?'Creando ruta…':'Crear ruta con mi GPS'}</button><button class="btn outline" data-action="route-demo" ${routeLoading||!online?'disabled':''}>Probar sin GPS</button></div>`:''}<p class="route-status" role="status">${escapeHtml(routeStatus)}</p>${routeMap()}${routeData?`<div class="route-metrics"><div><b>${eta} min</b><span>ETA base, sin tráfico</span></div><div><b>${(routeData.distance/1000).toLocaleString('es-CL',{maximumFractionDigits:1})} km</b><span>Por calles</span></div></div><label class="route-wait">Espera que tú observes <small>Opcional, no en vivo</small><select data-route-wait aria-label="Espera observada en el local">${[0,5,10,15,20].map(n=>`<option value="${n}" ${routeWait===n?'selected':''}>${n} min</option>`).join('')}</select></label><p class="route-total">Llegada + espera indicada <b>${eta+routeWait} min</b></p><label class="zone-label">Abrir navegación con<select data-nav-app aria-label="Aplicación de navegación"><option value="waze" ${state.settings.navApp==='waze'?'selected':''}>Waze</option><option value="google" ${state.settings.navApp==='google'?'selected':''}>Google Maps</option></select></label><div class="route-actions"><button class="btn outline" data-action="route-another">Otro retiro</button><a class="btn primary" href="${navUrl}" target="_blank" rel="noopener noreferrer">Abrir navegación</a></div><p class="note">Waze abre el destino y calcula desde la ubicación actual. Google Maps recibe origen y destino. Ninguno incluye una espera real del local. La ruta de vista previa es vial para auto.</p>`:`<p class="note">Al crear la ruta se consulta un servicio externo con origen y destino. El mapa usa OpenStreetMap. Tu ubicación no se guarda en el perfil.</p>`}</section>${vehicle().type==='fuel'?fuelCard():vehicle().type==='electric'?chargeCard():''}`;
   }
   function kmBetween(a,b) {
     const rad=Math.PI/180,dLat=(b.lat-a.lat)*rad,dLon=(b.lon-a.lon)*rad;
@@ -287,6 +325,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
         if(!Number.isFinite(origin.lat)||!Number.isFinite(origin.lon))throw new Error('El GPS devolvió una ubicación inválida.');
       }
       if(kmBetween(origin,{lat:-33.425,lon:-70.61})>35)throw new Error('La demostración está en Santiago. Usa “Probar sin GPS” si estás lejos.');
+      if(!demo&&!keepOrigin&&vehicle().type==='fuel'){priceZone='Metropolitana';state.settings.priceZone=priceZone;if(!state.settings.fuelPriceManual)syncFuelPrice();save();}
       const index=keepOrigin?(routeCursor+1)%ROUTE_STOPS.length:crypto.getRandomValues(new Uint32Array(1))[0]%ROUTE_STOPS.length;
       routeCursor=index;const stop=ROUTE_STOPS[index];
       routeStatus='Calculando el trayecto por calles…';render();
@@ -308,8 +347,9 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
   }
   function vehiclePage() {
     const v=vehicle(),{investment,net,remaining,progress}=recovery();
-    const fields=[['fuelPrice','Precio de bencina 93','por litro',0,3000,1],['kwhPrice','Precio de electricidad','por kWh',0,1000,1],['dataMonthly','Datos móviles','al mes',0,100000,100],['hoursMonthly','Horas de trabajo','al mes',1,400,1],['goal','Meta neta','por hora',1,100000,100],['investment','Invertido en el vehículo','total',0,100000000,1000]];
-    return `<div><p class="kicker">Tus costos reales</p><h1 class="title" id="page-title" tabindex="-1">Tu vehículo, tus números</h1><p class="lead">Partimos con valores de ejemplo. Ajústalos cuando quieras.</p></div><section class="card"><h2>Vehículo</h2>${vehiclePicker()}<p class="note" style="margin-top:10px">${v.type==='human'?'Sin combustible':`${v.consumption} ${v.unit}`} · ${money(v.maintenance)}/km en mantención estimada.</p></section><section class="card"><h2>Valores para calcular</h2><div class="fields" style="margin-top:12px">${fields.map(([key,label,suffix,min,max,step])=>`<div class="field"><label for="setting-${key}">${label}</label><div class="input-wrap"><span class="pre" aria-hidden="true">${key==='hoursMonthly'?'':'$'}</span><input id="setting-${key}" type="text" inputmode="numeric" min="${min}" max="${max}" step="${step}" data-setting="${key}" value="${Number(state.settings[key]).toLocaleString('es-CL')}" aria-describedby="hint-${key}"><span class="suf" aria-hidden="true">${suffix}</span></div><p class="hint" id="hint-${key}">Valor editable; se guarda solo aquí.</p></div>`).join('')}</div><p class="note" style="margin-top:14px">Semáforo: verde si llega a tu meta; amarillo entre 90 % y 99 %; rojo bajo 90 %.</p></section><section class="card"><h2>Inversión</h2><dl class="inv-grid"><div><dt>Invertido</dt><dd>${money(investment)}</dd></div><div><dt>Neto acumulado</dt><dd>${money(net)}</dd></div><div><dt>Por recuperar*</dt><dd>${money(remaining)}</dd></div></dl><div class="progress grow"><span style="width:${progress}%"></span></div><p class="note" style="margin-top:10px">* Comparación ilustrativa, no amortización contable.</p></section><section class="card"><h2>Demostración y seguridad</h2><p class="note">Velocidad simulada: ${state.speed} km/h.</p><div class="btn-col" style="margin-top:12px"><button class="btn outline block" data-action="speed">Probar bloqueo a 15 km/h</button><button class="btn danger block" data-action="reset">Borrar mis datos locales</button></div></section><p class="note center">Sin cuentas en línea. El GPS se usa solo cuando creas una ruta. Los cambios se guardan en este navegador.</p>`;
+    const energyFields=v.type==='fuel'?[['fuelPrice',`Precio de gasolina ${state.settings.fuelGrade}`,'por litro',0,3000,1]]:v.type==='electric'?[['kwhPrice','Precio de electricidad','por kWh',0,3000,1],['batteryKwh','Capacidad de batería','kWh',0,200,0.1],['chargeKw','Potencia real del cargador','kW',0.1,350,0.1],['chargeStart','Carga actual','%',0,100,1],['chargeEnd','Carga deseada','%',0,100,1]]:[];
+    const fields=[...energyFields,['dataMonthly','Datos móviles','al mes',0,100000,100],['hoursMonthly','Horas de trabajo','al mes',1,400,1],['goal','Meta neta','por hora',1,100000,100],['investment','Invertido en el vehículo','total',0,100000000,1000]];
+    return `<div><p class="kicker">Tus costos reales</p><h1 class="title" id="page-title" tabindex="-1">Tu vehículo, tus números</h1><p class="lead">Partimos con valores de ejemplo. Ajústalos cuando quieras.</p></div><section class="card"><h2>Vehículo</h2>${vehiclePicker()}<p class="note">Modelos orientativos disponibles en Chile; no representan un ranking de repartidores.</p><p class="note" style="margin-top:10px">${v.type==='human'?'Sin combustible':`${v.consumption} ${v.unit}`} · ${money(v.maintenance)}/km en mantención estimada.</p></section>${v.type==='fuel'?fuelCard():''}<section class="card"><h2>Valores para calcular</h2><div class="fields" style="margin-top:12px">${fields.map(([key,label,suffix,min,max,step])=>`<div class="field"><label for="setting-${key}">${label}</label><div class="input-wrap"><span class="pre" aria-hidden="true">${['hoursMonthly','batteryKwh','chargeKw','chargeStart','chargeEnd'].includes(key)?'':'$'}</span><input id="setting-${key}" type="text" inputmode="${step===0.1?'decimal':'numeric'}" min="${min}" max="${max}" step="${step}" data-setting="${key}" value="${Number(state.settings[key]).toLocaleString('es-CL')}" aria-describedby="hint-${key}"><span class="suf" aria-hidden="true">${suffix}</span></div><p class="hint" id="hint-${key}">Valor editable; se guarda solo aquí.</p></div>`).join('')}</div><p class="note" style="margin-top:14px">Semáforo: verde si llega a tu meta; amarillo entre 90 % y 99 %; rojo bajo 90 %.</p></section>${v.type==='electric'?chargeCard():''}<section class="card"><h2>Inversión</h2><dl class="inv-grid"><div><dt>Invertido</dt><dd>${money(investment)}</dd></div><div><dt>Neto acumulado</dt><dd>${money(net)}</dd></div><div><dt>Por recuperar*</dt><dd>${money(remaining)}</dd></div></dl><div class="progress grow"><span style="width:${progress}%"></span></div><p class="note" style="margin-top:10px">* Comparación ilustrativa, no amortización contable.</p></section><section class="card"><h2>Demostración y seguridad</h2><p class="note">Velocidad simulada: ${state.speed} km/h.</p><div class="btn-col" style="margin-top:12px"><button class="btn outline block" data-action="speed">Probar bloqueo a 15 km/h</button><button class="btn danger block" data-action="reset">Borrar mis datos locales</button></div></section><p class="note center">Sin cuentas en línea. El GPS se usa solo cuando creas una ruta. Los cambios se guardan en este navegador.</p>`;
   }
   function security() { return `<div class="security" role="alertdialog" aria-modal="true" aria-labelledby="security-title" aria-describedby="security-desc"><div class="sec-card"><span class="sec-icon">${icon('shield','lg')}</span><h2 id="security-title">Primero, detente</h2><p id="security-desc">Sobre 10 km/h bloqueamos los botones. Tu seguridad va primero.</p><div class="sec-speed">${state.speed}<small>km/h</small></div><button class="btn lime big block" data-action="stop">Simular detención</button><p>Control simulado: no usa GPS.</p></div></div>`; }
   function render() {
@@ -417,9 +457,9 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     if(action==='speed'){state.speed=15;render();return;}
     if(action==='stop'){state.speed=0;render();toast('Interacción desbloqueada.');return;}
     if(action==='apply-price'){
-      const entry=fuelPrices?.zones?.find(z=>z.name===priceZone);
+      const entry=fuelPrices?.zones?.find(z=>z.name===priceZone)?.prices?.[state.settings.fuelGrade];
       if(!entry)return;
-      state.settings.fuelPrice=Math.round(entry.average);save();render();toast('Promedio zonal guardado en tus costos.');return;
+      state.settings.fuelPriceManual=false;syncFuelPrice();render();toast(`Promedio ${state.settings.fuelGrade} guardado. No es el precio de una estación.`);return;
     }
     if(action==='route-gps'){createRoute(false);return;}
     if(action==='route-demo'){createRoute(true);return;}
@@ -448,10 +488,12 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
       if(!state.onboarded){const first=VEHICLES.find(v=>vehicleGroup(v)===pickerGroup&&vehicleBrand(v)===pickerBrand);state.vehicleId=first.id;state.settings.investment=first.investment;save();}
       render();return;
     }
-    if(t.hasAttribute('data-price-zone')){priceZone=t.value;render();return;}
+    if(t.hasAttribute('data-price-zone')){priceZone=t.value;state.settings.priceZone=priceZone;state.settings.fuelPriceManual=false;syncFuelPrice();save();render();return;}
+    if(t.hasAttribute('data-fuel-grade')){state.settings.fuelGrade=t.value;state.settings.fuelPriceManual=false;syncFuelPrice();save();render();return;}
+    if(t.hasAttribute('data-nav-app')){state.settings.navApp=t.value;save();render();return;}
     if(t.id==='custom-group' || t.id==='custom-type'){syncCustomVehicleForm(t.form);return;}
     if(t.dataset.field==='vehicleId'){state.vehicleId=t.value;state.settings.investment=vehicle().investment;save();render();return;}
-    if(t.dataset.setting){const key=t.dataset.setting,raw=t.value.trim()===''?NaN:Number(t.value.replace(/\./g,'')),lo=Number(t.min),hi=Number(t.max);if(!Number.isFinite(raw)||!Number.isInteger(raw)||raw<lo||raw>hi){t.setAttribute('aria-invalid','true');t.closest('.field')?.classList.add('invalid');toast(`Ingresa un valor entre ${lo} y ${hi}.`,true);return;}state.settings[key]=raw;save();render();toast('Valor actualizado.');}
+    if(t.dataset.setting){const key=t.dataset.setting,raw=t.value.trim()===''?NaN:Number(t.value.replace(/\./g,'').replace(',','.')),lo=Number(t.min),hi=Number(t.max),decimal=['batteryKwh','chargeKw'].includes(key);if(!Number.isFinite(raw)||(!decimal&&!Number.isInteger(raw))||raw<lo||raw>hi){t.setAttribute('aria-invalid','true');t.closest('.field')?.classList.add('invalid');toast(`Ingresa un valor entre ${lo} y ${hi}.`,true);return;}state.settings[key]=raw;if(key==='fuelPrice')state.settings.fuelPriceManual=true;save();render();toast('Valor actualizado.');}
   });
   app.addEventListener('input',e=>{if(e.target.dataset.setting){e.target.removeAttribute('aria-invalid');e.target.closest('.field')?.classList.remove('invalid');}});
   app.addEventListener('focusin',e=>{if(e.target.dataset.setting)e.target.value=e.target.value.replace(/\./g,'');});

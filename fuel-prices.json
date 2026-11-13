@@ -1,32 +1,88 @@
 {
   "source": "https://api.bencinaenlinea.cl/api/estaciones/precios_combustibles/export_zonal",
-  "product": "Gasolina 93",
+  "product": "Gasolinas 93, 95 y 97",
   "unit": "CLP/L",
-  "fetchedAt": "2026-11-13T03:37:43.766Z",
+  "fetchedAt": "2026-11-13T13:18:28.252Z",
   "zones": [
     {
       "name": "Zona Norte",
-      "average": 1679.875,
-      "min": 1522,
-      "max": 1722
+      "prices": {
+        "93": {
+          "average": 1680.47,
+          "min": 1522,
+          "max": 1722
+        },
+        "95": {
+          "average": 1712.3,
+          "min": 1554,
+          "max": 1754
+        },
+        "97": {
+          "average": 1744.363,
+          "min": 1578,
+          "max": 1770
+        }
+      }
     },
     {
       "name": "Zona Centro",
-      "average": 1611.346,
-      "min": 1192,
-      "max": 1907
+      "prices": {
+        "93": {
+          "average": 1611.652,
+          "min": 1192,
+          "max": 1907
+        },
+        "95": {
+          "average": 1646.03,
+          "min": 1221,
+          "max": 1710
+        },
+        "97": {
+          "average": 1686.719,
+          "min": 1466,
+          "max": 1737
+        }
+      }
     },
     {
       "name": "Metropolitana",
-      "average": 1575.446,
-      "min": 1387,
-      "max": 1644
+      "prices": {
+        "93": {
+          "average": 1575.705,
+          "min": 1387,
+          "max": 1644
+        },
+        "95": {
+          "average": 1621.085,
+          "min": 1434,
+          "max": 1697
+        },
+        "97": {
+          "average": 1672.799,
+          "min": 1277,
+          "max": 1750
+        }
+      }
     },
     {
       "name": "Zona Sur",
-      "average": 1657.429,
-      "min": 1188,
-      "max": 1902
+      "prices": {
+        "93": {
+          "average": 1657.653,
+          "min": 1188,
+          "max": 1902
+        },
+        "95": {
+          "average": 1686.492,
+          "min": 1210,
+          "max": 1917
+        },
+        "97": {
+          "average": 1716.9,
+          "min": 1230,
+          "max": 1924
+        }
+      }
     }
   ]
 }

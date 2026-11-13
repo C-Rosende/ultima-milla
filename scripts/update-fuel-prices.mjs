@@ -29,15 +29,18 @@ export function parseCsv(input) {
 }
 
 export function extractPrices(rows, fetchedAt = new Date().toISOString()) {
-  const matches = rows.filter(row => row.combustible_nombre_corto === '93' || row.combustible_nombre_largo === 'Gasolina 93');
+  const grades = ['93', '95', '97'];
   const zones = ZONES.map(name => {
-    const row = matches.find(item => item.zona_geografica_nombre === name);
-    if (!row || row.unidad_cobro_nombre_corto !== '$/L') throw new Error(`Falta Gasolina 93 en ${name}`);
-    const average = Number(row.precio_promedio), min = Number(row.precio_min), max = Number(row.precio_max);
-    if (![average, min, max].every(Number.isFinite) || min <= 0 || min > average || average > max) throw new Error(`Precio inválido en ${name}`);
-    return { name, average, min, max };
+    const prices = Object.fromEntries(grades.map(grade => {
+      const row = rows.find(item => item.zona_geografica_nombre === name && item.combustible_nombre_largo === `Gasolina ${grade}`);
+      if (!row || row.unidad_cobro_nombre_corto !== '$/L') throw new Error(`Falta Gasolina ${grade} en ${name}`);
+      const average = Number(row.precio_promedio), min = Number(row.precio_min), max = Number(row.precio_max);
+      if (![average, min, max].every(Number.isFinite) || min <= 0 || min > average || average > max) throw new Error(`Precio inválido en ${name}`);
+      return [grade, { average, min, max }];
+    }));
+    return { name, prices };
   });
-  return { source: SOURCE, product: 'Gasolina 93', unit: 'CLP/L', fetchedAt, zones };
+  return { source: SOURCE, product: 'Gasolinas 93, 95 y 97', unit: 'CLP/L', fetchedAt, zones };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
