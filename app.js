@@ -115,6 +115,13 @@
   let screen = SCREENS.includes(DIRECT) ? DIRECT : (state.activeDelivery || state.pendingOffer ? 'oferta' : 'inicio');
   let introStep = 0;
   let currentOffer = state.pendingOffer;
+  let manualDraft = currentOffer?.manual ? {
+    gross:currentOffer.gross, km:currentOffer.km, platform:currentOffer.platform,
+    restaurant:currentOffer.restaurant==='Restaurante no indicado'?'':currentOffer.restaurant,
+    minutes:currentOffer.minutesEstimated?'':currentOffer.minutes,
+    waitMin:currentOffer.waitSource==='manual'?currentOffer.waitMin:'',
+    returnKm:currentOffer.returnKm||''
+  } : null;
   let waitStart = state.activeDelivery?.startedAt || 0;
   let acceptedOffer = state.activeDelivery?.offer || null;
   let acceptedCalc = state.activeDelivery?.calc || null;
@@ -168,12 +175,12 @@
     const waitMin=observed.length ? Math.round(observed.reduce((sum,j)=>sum+Number(j.waitMin),0)/observed.length) : offer.waitMin;
     return {...offer,waitMin,waitCount:observed.length,waitSource:observed.length>=2?'promedio':observed.length===1?'ultima':'ejemplo'};
   }
-  function platformClass(p) { return p === 'Uber Eats' ? 'uber' : p === 'PedidosYa' ? 'pedidos' : 'rappi'; }
+  function platformClass(p) { return p === 'Uber Eats' ? 'uber' : p === 'PedidosYa' ? 'pedidos' : p === 'Rappi' ? 'rappi' : 'other'; }
   const icon = (name, cls='') => {
     const paths={arrow:'<path d="M5 16 16 5M7 5h9v9"/>',home:'<path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-6h6v6"/>',offer:'<path d="M4 7h16M4 12h16M4 17h10"/><circle cx="19" cy="17" r="2"/>',summary:'<path d="M4 20V10m6 10V4m6 16v-8m4 8V7"/>',map:'<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15m6-12v15"/>',settings:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>',shield:'<path d="m12 2 8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',check:'<path d="m4 12 5 5L20 6"/>',fuel:'<path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h14M7 7h6v5H7zM15 8h2l2 3v7a2 2 0 0 0 2 0v-6l-2-2"/>',bike:'<circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="m5 17 5-9 4 9H5m9 0 5-8h-4m-6-3h3"/>',car:'<path d="m4 16 2-8h12l2 8v4H4zM2 16h20M7 20v2m10-2v2"/>',bolt:'<path d="m13 2-8 11h6l-1 9 9-12h-6z"/>'};
     return `<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true">${paths[name]||paths.arrow}</svg>`;
   };
-  const logo = p => `<span class="logo ${platformClass(p)}" aria-hidden="true">${p==='Uber Eats'?'U':p==='PedidosYa'?'P':'R'}</span>`;
+  const logo = p => `<span class="logo ${platformClass(p)}" aria-hidden="true">${p==='Uber Eats'?'U':p==='PedidosYa'?'P':p==='Rappi'?'R':'·'}</span>`;
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const vehicleGroup = v => v.group.includes('Bici') ? 'Bicicleta' : v.group.includes('Moto') ? 'Moto' : v.group;
   const vehicleBrand = v => v.brand || ({urban:'Genérica',emoto:'Genérica',scooter:'Xiaomi',morbidelli:'Super Soco',ninebot:'Segway',i10:'Hyundai',ebike:'Oxford'}[v.id] || v.name.split(' ')[0]);
@@ -212,12 +219,14 @@
       ? `Promedio de ${count} esperas que mediste aquí`
       : offer.waitSource==='ultima' && count===1
         ? 'Tu última espera medida aquí'
-        : 'Estimación para esta oferta de prueba';
+        : offer.waitSource==='manual' ? 'Espera que ingresaste para este pedido' : offer.manual ? 'Estimación orientativa; puedes editarla' : 'Estimación para esta oferta de prueba';
     return `<section class="card wait-insight" aria-label="Espera en el restaurante"><div class="wait-insight-head"><div><p class="kicker">ESPERA EN ${escapeHtml(offer.restaurant)}</p><strong>${Number(offer.waitMin)||0} <small>min</small></strong></div>${icon('clock','lg')}</div><p>${source}. No es un dato en vivo del restaurante.</p></section>`;
   }
   function shell(content) {
     if (screen==='inicio') {
+      content=content.replace('<div class="decide"><button class="btn lime" data-action="simulate">Simular oferta</button>', '<div class="home-decision"><span class="home-decision-index">LA HERRAMIENTA PRINCIPAL</span><strong>Antes de aceptar,<br>mira lo que queda.</strong><p>Ingresa el pago y los km de cualquier oferta.</p><button class="btn lime block" data-screen="oferta">Evaluar mi pedido <span aria-hidden="true">→</span></button></div><div class="decide"><button class="btn outline" data-action="simulate">Probar oferta demo</button>');
       if(state.profile?.name) content=content.replace('Hola, Luis.',`Hola, ${escapeHtml(state.profile.name.split(/\s+/)[0])}.`);
+      content=content.replace('Así va tu día en Santiago.','Así va tu turno.');
       content=content.replace('</section><div class="decide">',`</section>${shiftCard()}${state.lastOutcomeId?'<button class="last-result" data-screen="resultado">Ver último resultado <span aria-hidden="true">→</span></button>':''}<div class="decide">`);
       content=content.replace('</section><section><div class="section-head"><h2>Actividad reciente',`</section>${refuelSummary()}<section><div class="section-head"><h2>Actividad reciente`);
     }
@@ -232,6 +241,12 @@
       const decision=calc.signal==='green'?'Aceptar':calc.signal==='yellow'?'Revisar antes de aceptar':'Rechazar';
       content=content.replace('<div class="verdict ',`${offerWaitCard(offer)}<div class="verdict `);
       if(!acceptedOffer) content=content.replace(`<div class="v-title">${signalText(calc.signal)}</div>`,`<div class="v-title">Recomendación: ${decision}</div>`);
+      if(offer.manual) {
+        content=content.replace('Nueva oferta · ', 'Tus datos · ');
+        content=content.replace('Calculado con tus costos y el regreso sin pedido.', offer.returnKm>0?'Calculado con tus costos y el regreso que indicaste.':'Calculado con tus costos. No incluye regreso sin pedido.');
+        content=content.replace('Estimación de demostración; no recibe ofertas reales.', 'Estimación orientativa con datos ingresados por ti; no recibe ofertas reales.');
+        content=content.replace('<div class="card"><div class="net-line">', `<div class="manual-context"><span>02 / 02 · ANÁLISIS</span><p>${offer.minutesEstimated?'Tiempo de viaje estimado según distancia. ':'Tiempo de viaje ingresado por ti. '}${offer.waitSource==='manual'?'Espera ingresada por ti. ':'Espera orientativa o de tu historial. '}No usa tráfico en vivo.</p>${!acceptedOffer?'<button class="btn link" data-action="edit-manual">Editar datos</button>':''}</div><div class="card"><div class="net-line">`);
+      }
     }
     if(screen==='resultado') content=content.replace('<div class="result-actions">',`${platformComparison()}<div class="result-actions">`);
     content=content.replace('Si cargas a otro precio, escríbelo en Ajustes. El GPS de esta demo solo sirve para rutas en Santiago; no detecta la estación.','Al registrar una carga, el precio real por litro actualiza tus próximos cálculos.');
@@ -278,7 +293,7 @@
   function home() {
     const jobs = state.jobs.filter(j=>j.date===today() && j.status==='completed');
     const totals = aggregate(jobs);
-    const recent = state.jobs.slice(-4).reverse();
+    const recent = state.jobs.slice(-4).reverse().map(j=>({...j,platform:escapeHtml(j.platform),restaurant:escapeHtml(j.restaurant)}));
     return `<div><p class="kicker">Tu turno · ${new Date().toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'})}</p><h1 class="title" id="page-title" tabindex="-1">Hola, Luis.</h1><p class="lead">Así va tu día en Santiago.</p></div><section class="hero deco" aria-label="Ganancia neta de hoy"><p class="label">Te queda hoy</p><div class="money" data-count="${Math.round(totals.net)}">${money(totals.net)}</div><p class="sub">Después de ${money(totals.fuel+totals.maintenance+totals.data)} en costos</p><dl class="hero-stats"><div><dt>Por hora</dt><dd>${money(totals.hourly)}</dd></div><div><dt>Pedidos</dt><dd>${jobs.length}</dd></div><div><dt>Sin pedido</dt><dd>${totals.emptyKm.toFixed(1)} km</dd></div></dl></section><div class="decide"><button class="btn lime" data-action="simulate">Simular oferta</button><button class="btn outline" data-screen="resumen">Ver resumen ${icon('arrow','sm')}</button></div><section><div class="section-head"><h2>Plataformas</h2><span class="aside">Conexión simulada</span></div><div class="chips">${['Uber Eats','PedidosYa','Rappi'].map(p=>`<span class="chip ${state.connected.includes(p)?'':'off'}">${logo(p)}${p}</span>`).join('')}</div></section><section><div class="section-head"><h2>Actividad reciente</h2><button class="btn link" data-screen="resumen">Ver todo</button></div><div class="card">${recent.length?recent.map(j=>`<div class="row"><span class="dot ${j.status==='rejected'?'red':'green'}"></span><span class="main"><span class="t1">${j.platform}</span> <span class="t2">${j.status==='rejected'?'Oferta rechazada':j.restaurant} · ${j.date===today()?'Hoy':j.date.slice(5)}</span></span><span class="amt ${j.status==='rejected'?'neg':''}">${j.status==='rejected'?'Rechazada':money(j.net)}</span></div>`).join(''):'<div class="empty"><h2>Aún no hay entregas</h2><p>Cuando completes una, aparecerá aquí.</p></div>'}</div></section><p class="note center">Cifras de demostración. No recibe ofertas reales.</p>`;
   }
   function deliveryActions() {
@@ -294,8 +309,9 @@
     return `<section class="card journey" aria-label="Estado del pedido"><p class="kicker">PEDIDO EN CURSO · DEMO</p><ol class="journey-steps">${steps.map(([stage,name],i)=>`<li class="${i<active?'done':i===active?'active':''}"><span aria-hidden="true">${i<active?'✓':i+1}</span><b>${name}</b></li>`).join('')}</ol><p class="journey-detail">${detail}</p>${deliveryStage==='arrived'?`<p class="journey-timer">Espera medida <strong id="wait-timer">00:00</strong></p>`:deliveryStage==='picked'?`<p class="note">Espera en el local: ${measuredWaitMin} min medidos.</p>`:''}<button class="btn accept big block" data-action="${action}">${label}</button><button class="btn outline block" data-screen="mapa">Ver mapa de prueba</button><p class="note">El mapa muestra un retiro ilustrativo, no el destino de este pedido.</p></section>`;
   }
   function offerPage() {
-    if (!currentOffer && !acceptedOffer) return `<div><p class="kicker">Decide con tus números</p><h1 class="title" id="page-title" tabindex="-1">¿Me conviene?</h1><p class="lead">Mira lo que te quedaría antes de aceptar.</p></div><div class="card empty"><span class="empty-ic">${icon('offer','lg')}</span><h2>No hay ofertas por ahora</h2><p>Prueba con una oferta de ejemplo.</p><button class="btn primary" data-action="simulate">Simular oferta</button></div><p class="note center">La interacción se bloquea sobre 10 km/h.</p>`;
-    const o = currentOffer || acceptedOffer;
+    if (!currentOffer && !acceptedOffer) return `<div class="decision-intro"><p class="kicker">LA DECISIÓN ANTES DEL PEDIDO</p><h1 class="title" id="page-title" tabindex="-1">¿Cuánto me queda?</h1><p class="lead">Pon el pago y la distancia de la oferta. Te mostramos el neto estimado antes de aceptar.</p></div><section class="card manual-card"><div class="manual-card-head"><span class="manual-mark">01 / 02</span><h2>Evalúa tu pedido</h2><p>Solo necesitas 2 datos para empezar.</p></div><form id="manual-offer-form" class="manual-form"><div class="manual-primary"><label for="manual-gross">Pago ofrecido <span>CLP</span></label><input id="manual-gross" name="gross" type="number" inputmode="numeric" min="100" max="1000000" step="1" placeholder="Ej.: 4100" value="${manualDraft?.gross??''}" required><label for="manual-km">Distancia del pedido <span>km</span></label><input id="manual-km" name="km" type="number" inputmode="decimal" min="0.1" max="200" step="0.1" placeholder="Ej.: 3,2" value="${manualDraft?.km??''}" required></div><details class="manual-more"><summary>Ajustar tiempo y contexto <span>Opcional</span></summary><div class="manual-extra"><label for="manual-platform">Plataforma</label><select id="manual-platform" name="platform">${['Uber Eats','PedidosYa','Rappi','Otra'].map(p=>`<option ${manualDraft?.platform===p?'selected':''}>${p}</option>`).join('')}</select><label for="manual-restaurant">Restaurante</label><input id="manual-restaurant" name="restaurant" maxlength="60" autocomplete="off" placeholder="Si lo conoces" value="${escapeHtml(manualDraft?.restaurant||'')}"><label for="manual-minutes">Tiempo de viaje <span>min · si no lo sabes, lo estimamos</span></label><input id="manual-minutes" name="minutes" type="number" inputmode="numeric" min="1" max="360" step="1" placeholder="Estimado según distancia" value="${manualDraft?.minutes??''}"><label for="manual-wait">Espera en el local <span>min</span></label><input id="manual-wait" name="waitMin" type="number" inputmode="numeric" min="0" max="180" step="1" placeholder="8 min si no la sabes" value="${manualDraft?.waitMin??''}"><label for="manual-return">Regreso sin pedido <span>km</span></label><input id="manual-return" name="returnKm" type="number" inputmode="decimal" min="0" max="200" step="0.1" placeholder="0 km si no lo sabes" value="${manualDraft?.returnKm??''}"></div></details><button class="btn primary big block manual-submit" type="submit">Calcular cuánto me queda ${icon('arrow','sm')}</button></form></section><div class="demo-separator"><span>O prueba el recorrido completo</span></div><button class="btn outline block" data-action="simulate">Recibir una oferta de ejemplo</button><p class="note center">Estimación, no ingreso garantizado. La app no lee pedidos reales.</p>`;
+    const o = {...(currentOffer || acceptedOffer)};
+    for (const key of ['platform','restaurant','from','to']) o[key]=escapeHtml(o[key]);
     const calc = acceptedOffer ? acceptedCalc : calculateOffer(o,vehicle(),state.settings);
     const ratio=Math.max(0,Math.min(100,calc.hourly/state.settings.goal*70));
     const costs=Math.max(0,calc.cost), base=Math.max(calc.gross,1);
@@ -563,6 +579,28 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     state.jobs.push(job);state.lastOutcomeId=job.id;
     currentOffer=null;screen='resultado';scheduleNextOffer();save();render();
   }
+  app.addEventListener('submit', e=>{
+    if(e.target.id!=='manual-offer-form')return;
+    e.preventDefault();
+    if(state.speed>10 || acceptedOffer)return;
+    const form=e.target;
+    if(!form.reportValidity())return;
+    const gross=Number(form.elements.gross.value), km=Number(form.elements.km.value);
+    const optional=(name,max)=>{
+      const raw=form.elements[name].value.trim();
+      if(!raw)return null;
+      const value=Number(raw);
+      return Number.isFinite(value)&&value>=0&&value<=max?value:NaN;
+    };
+    const minutes=optional('minutes',360),waitMin=optional('waitMin',180),returnKm=optional('returnKm',200);
+    if(!Number.isInteger(gross)||gross<100||gross>1000000||!Number.isFinite(km)||km<.1||km>200||[minutes,waitMin,returnKm].some(n=>Number.isNaN(n))){toast('Revisa el pago, la distancia y los ajustes opcionales.',true);return;}
+    const restaurant=form.elements.restaurant.value.trim().replace(/\s+/g,' ').slice(0,60);
+    const platform=form.elements.platform.value;
+    manualDraft={gross,km,platform,restaurant,minutes:minutes??'',waitMin:waitMin??'',returnKm:returnKm??''};
+    const offer={id:`manual-${Date.now()}`,manual:true,platform,gross,km,returnKm:returnKm??0,minutes:minutes??Math.max(5,Math.round(8+km*4.5)),minutesEstimated:minutes===null,waitMin:waitMin??8,waitSource:waitMin===null?'estimada':'manual',from:'Retiro',to:'Entrega',restaurant:restaurant||'Restaurante no indicado'};
+    currentOffer=waitMin===null&&restaurant?offerWithWait(offer):offer;
+    screen='oferta';save();render();
+  });
   app.addEventListener('click',e=>{
     const button=e.target.closest('[data-action],[data-screen],[data-period],[data-vehicle],[data-connect]');
     if(!button)return;
@@ -609,6 +647,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
       state.settings.fuelGrade=grade;state.settings.fuelPrice=unitPrice;state.settings.fuelPriceManual=true;refuelStation='';refuelSuggestedStation='';refuelStatus='Busca una estación cercana con tu GPS o escribe su nombre.';screen='inicio';save();render();toast(`Carga guardada: ${money(amount)} · ${money(unitPrice)}/l.`);return;
     }
     if(action==='simulate'){simulate();return;}
+    if(action==='edit-manual'){if(!currentOffer?.manual)return;currentOffer=null;save();render();document.getElementById('manual-gross')?.focus();return;}
     if(action==='accept'){if(!currentOffer)return;acceptedOffer=currentOffer;acceptedCalc=calculateOffer(currentOffer,vehicle(),state.settings);currentOffer=null;waitStart=0;measuredWaitMin=null;deliveryStage='accepted';save();render();toast('Pedido aceptado. Avanza al local.');return;}
     if(action==='start-wait'){if(!acceptedOffer||deliveryStage!=='accepted')return;waitStart=Date.now();deliveryStage='arrived';save();render();toast('Llegada registrada.');return;}
     if(action==='pickup-order'){if(!acceptedOffer||deliveryStage!=='arrived')return;measuredWaitMin=waitStart>0?Math.max(0,Math.round((Date.now()-waitStart)/60000)):null;waitStart=0;deliveryStage='picked';save();render();toast('Retiro registrado.');return;}

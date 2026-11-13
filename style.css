@@ -519,6 +519,54 @@ h2 { font-size: 17px; line-height: 1.25; font-weight: 700; letter-spacing: -.01e
 .charge-summary b { display: block; color: var(--forest); font-size: clamp(21px, 5.5vw, 28px); line-height: 1.1; overflow-wrap: anywhere; }
 .charge-summary span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
 .card .btn + .btn, .card .btn + a.btn { margin-top: 8px; }
+.home-decision {
+  position: relative; overflow: hidden; isolation: isolate;
+  padding: 20px; border-radius: 24px; color: #f3f8ed;
+  background: radial-gradient(circle at 90% 0%, #3a6744 0, transparent 42%), linear-gradient(145deg, #153827, #0d241c 72%);
+  box-shadow: 0 14px 28px -22px #0c2419;
+}
+.home-decision::after {
+  content: ''; position: absolute; z-index: -1; width: 150px; height: 150px; right: -32px; top: 12px;
+  border: 1px solid rgba(200,240,108,.22); border-radius: 50%; box-shadow: 0 0 0 26px rgba(200,240,108,.045), 0 0 0 53px rgba(200,240,108,.035);
+}
+.home-decision-index,.manual-mark,.manual-context>span { display: block; font-size: 11px; letter-spacing: .13em; font-weight: 800; }
+.home-decision-index { color: var(--lime); }
+.home-decision strong { display: block; margin-top: 13px; font-size: clamp(24px, 7.8vw, 31px); line-height: 1.08; letter-spacing: -.04em; text-wrap: balance; }
+.home-decision p { max-width: 25ch; margin: 9px 0 16px; color: #c7d8ca; font-size: 14px; line-height: 1.4; }
+.home-decision .btn { justify-content: space-between; box-shadow: 0 6px 15px -10px #000; }
+.home-decision + .decide { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.manual-card { padding: 0; overflow: hidden; border-color: #cddfd0; box-shadow: 0 12px 30px -26px #163b24; }
+.manual-card-head { padding: 18px 18px 15px; background: linear-gradient(110deg,#e5f2e3,#f4f8ef); }
+.manual-card-head .manual-mark { color: var(--green); margin-bottom: 8px; }
+.manual-card-head h2 { font-size: 21px; letter-spacing: -.025em; }
+.manual-card-head p { margin-top: 3px; color: var(--ink-2); font-size: 13px; }
+.manual-form { padding: 16px 18px 18px; }
+.manual-primary, .manual-extra { display: grid; gap: 8px; }
+.manual-primary label, .manual-extra label { font-size: 13px; font-weight: 750; line-height: 1.35; }
+.manual-primary label span, .manual-extra label span { color: var(--muted); font-size: 12px; font-weight: 500; }
+.manual-primary input, .manual-extra input, .manual-extra select {
+  width: 100%; min-width: 0; min-height: 52px; padding: 11px 13px;
+  border: 1px solid var(--line-2); border-radius: 13px; outline: none;
+  background: #fff; color: var(--ink); font-size: 17px; font-variant-numeric: tabular-nums;
+}
+.manual-primary input { margin-bottom: 8px; font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+.manual-primary input::placeholder, .manual-extra input::placeholder { color: #86928a; font-size: 14px; font-weight: 400; }
+.manual-primary input:focus, .manual-extra input:focus, .manual-extra select:focus { border-color: var(--green); box-shadow: 0 0 0 3px #2f9d6222; }
+.manual-more { margin: 4px 0 14px; border-top: 1px solid var(--line); }
+.manual-more summary { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--green); font-size: 14px; font-weight: 700; cursor: pointer; }
+.manual-more summary span { color: var(--muted); font-size: 12px; font-weight: 500; }
+.manual-extra { padding: 5px 0 14px; }
+.manual-extra label:not(:first-child) { margin-top: 5px; }
+.manual-submit { justify-content: space-between; }
+.demo-separator { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 12px; }
+.demo-separator::before,.demo-separator::after { content: ''; height: 1px; flex: 1; background: var(--line-2); }
+.manual-context { padding: 12px 14px; border-radius: 15px; background: #eaf2e9; border: 1px solid #d4e4d5; }
+.manual-context>span { color: var(--green); }
+.manual-context p { margin-top: 4px; color: var(--ink-2); font-size: 13px; line-height: 1.42; }
+.manual-context .btn { margin-top: 2px; padding-left: 0; }
+.decision-intro .title { font-size: clamp(27px, 8vw, 34px); letter-spacing: -.04em; }
+.logo.other { background: var(--forest); color: var(--lime); }
+.hero .money, .net-line .big-num { overflow-wrap: anywhere; }
 .veh-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
 .veh {
   min-height: 64px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px;
