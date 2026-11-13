@@ -1,7 +1,8 @@
 (function () {
   'use strict';
   const { calculateOffer } = globalThis.UltimaMillaCalc;
-  const KEY = 'ultima-milla-demo-v1';
+  // Espacio propio para la demostración de Luis: no se mezclan perfiles de versiones anteriores.
+  const KEY = 'ultima-milla-luis-demo-v2';
   const DEMO = new URLSearchParams(location.search).get('demo') === '1';
   const DIRECT = new URLSearchParams(location.search).get('pantalla');
   const LUIS = globalThis.DATOS?.luis?.cifras || { espera_min:110, pedidos:19 };
@@ -106,13 +107,14 @@
         if (raw.jobs.some(j=>j.id?.startsWith('seed-13-')) && !raw.jobs.some(j=>j.id?.startsWith('seed-14-'))) {
           raw.jobs = [...seedHistory().filter(j=>j.date<dayAgo(13)), ...raw.jobs];
         }
-        return { ...defaults(), ...raw, profile:raw.profile?.name?raw.profile:defaults().profile, connected:raw.onboarded&&Array.isArray(raw.connected)?raw.connected:defaults().connected, refuels:Array.isArray(raw.refuels)?raw.refuels:[], settings:{...defaults().settings,...raw.settings}, onboarded:true, speed:0 };
+        return { ...defaults(), ...raw, profile:defaults().profile, connected:raw.onboarded&&Array.isArray(raw.connected)?raw.connected:defaults().connected, refuels:Array.isArray(raw.refuels)?raw.refuels:[], settings:{...defaults().settings,...raw.settings}, onboarded:true, speed:0 };
       }
     } catch (_) { /* El prototipo sigue funcionando si el almacenamiento está deshabilitado. */ }
     return defaults();
   }
   let state = load();
-  let screen = SCREENS.includes(DIRECT) ? DIRECT : (state.activeDelivery || state.pendingOffer ? 'oferta' : 'inicio');
+  // El QR siempre aterriza en Inicio; una vista específica solo se abre mediante enlace explícito.
+  let screen = SCREENS.includes(DIRECT) ? DIRECT : 'inicio';
   let introStep = 0;
   let currentOffer = state.pendingOffer;
   let manualDraft = currentOffer?.manual ? {
@@ -271,7 +273,7 @@
   }
   function settingsExtras() {
     const platforms = ['Uber Eats','PedidosYa','Rappi'];
-    return `<div><p class="kicker">Tu espacio de trabajo</p><h1 class="title" id="page-title" tabindex="-1">Ajustes</h1><p class="lead">Controla tu perfil, plataformas de ejemplo y costos.</p></div><section class="card"><h2>Perfil local</h2><form class="signup-form compact" id="profile-form"><label for="profile-name">Nombre</label><input id="profile-name" name="name" required minlength="2" maxlength="40" value="${escapeHtml(state.profile?.name)}"><label for="profile-email">Correo</label><input id="profile-email" name="email" type="email" required maxlength="120" value="${escapeHtml(state.profile?.email)}"><button type="button" class="btn outline block" data-action="save-profile">Guardar perfil</button></form><p class="note">Luis y su correo son datos de ejemplo. Este perfil vive solo en este dispositivo; no es una cuenta en línea.</p></section><section class="card"><h2>Plataformas de ejemplo</h2><p class="note">Activar una plataforma muestra sus ofertas simuladas. No se conecta a Uber Eats, PedidosYa ni Rappi.</p><div class="connect-list settings-connect">${platforms.map(p=>`<button class="connect" data-connect="${p}" aria-pressed="${state.connected.includes(p)}">${logo(p)}<span><span class="cn">${p}</span><br><span class="cs">Sin acceso a tu cuenta real</span></span><span class="state">${state.connected.includes(p)?'Activo':'Activar'}</span></button>`).join('')}</div></section>`;
+    return `<div><p class="kicker">Tu espacio de trabajo</p><h1 class="title" id="page-title" tabindex="-1">Ajustes</h1><p class="lead">Controla las plataformas de ejemplo y los costos del caso de Luis.</p></div><section class="card"><h2>Perfil de demostración</h2><p><strong>Luis</strong></p><p class="note">La sesión de Luis ya está iniciada. Es un personaje de ejemplo, no una cuenta en línea. Las pruebas se guardan solo en este dispositivo.</p></section><section class="card"><h2>Plataformas de ejemplo</h2><p class="note">Activar una plataforma muestra sus ofertas simuladas. No se conecta a Uber Eats, PedidosYa ni Rappi.</p><div class="connect-list settings-connect">${platforms.map(p=>`<button class="connect" data-connect="${p}" aria-pressed="${state.connected.includes(p)}">${logo(p)}<span><span class="cn">${p}</span><br><span class="cs">Sin acceso a tu cuenta real</span></span><span class="state">${state.connected.includes(p)?'Activo':'Activar'}</span></button>`).join('')}</div></section>`;
   }
   function customVehicleEditor() {
     const v=state.customVehicle;
@@ -610,13 +612,13 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     if(button.dataset.period){period=button.dataset.period;render();return;}
     if(button.dataset.vehicle){state.vehicleId=button.dataset.vehicle;state.settings.investment=vehicle().investment;save();render();return;}
     if(button.dataset.connect){const p=button.dataset.connect;if(state.connected.includes(p))state.connected=state.connected.filter(x=>x!==p);else state.connected.push(p);save();render();return;}
-    if(action==='save-profile-first' || action==='save-profile'){
-      const form=document.getElementById(action==='save-profile-first'?'signup-form':'profile-form');
+    if(action==='save-profile-first'){
+      const form=document.getElementById('signup-form');
       if(!form.reportValidity())return;
       const name=form.elements.name.value.trim().replace(/\s+/g,' '),email=form.elements.email.value.trim();
       if(name.length<2 || name.length>40 || email.length>120){toast('Revisa tu nombre y correo.',true);return;}
       state.profile={name,email};save();
-      if(action==='save-profile-first'){introStep=1;render();}else{render();toast('Perfil guardado en este dispositivo.');}
+      introStep=1;render();
       return;
     }
     if(action==='onboard-back'){introStep=Math.max(0,introStep-1);render();return;}
