@@ -7,7 +7,7 @@
   const LUIS = globalThis.DATOS?.luis?.cifras || { espera_min:110, pedidos:19 };
   if (new URLSearchParams(location.search).get('embebido') === '1') document.body.classList.add('embedded');
   if (DIRECT === 'resumen' && new URLSearchParams(location.search).get('compacto') === '1') document.body.classList.add('compact-summary');
-  const SCREENS = ['inicio', 'oferta', 'resumen', 'mapa', 'vehiculo'];
+  const SCREENS = ['inicio', 'oferta', 'resumen', 'mapa', 'vehiculo', 'carga'];
   const MONEY = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 });
   const VEHICLES = [
     { id:'cb190', group:'Moto', name:'Honda CB190R', type:'fuel', consumption:35, maintenance:57, investment:2850000, icon:'🏍', unit:'km/l' },
@@ -97,7 +97,7 @@
     }
     return jobs;
   }
-  function defaults() { return { onboarded:false, profile:null, connected:[], vehicleId:'cb190', customVehicle:null, settings:{fuelGrade:'93',priceZone:'Metropolitana',fuelPrice:1300,fuelPriceManual:false,kwhPrice:220,batteryKwh:0,chargeKw:2,chargeStart:20,chargeEnd:80,navApp:'waze',dataMonthly:12000,hoursMonthly:200,goal:5000,investment:2850000}, jobs:[], speed:0, offerCursor:0, pendingOffer:null, activeDelivery:null }; }
+  function defaults() { return { onboarded:false, profile:null, connected:[], vehicleId:'cb190', customVehicle:null, settings:{fuelGrade:'93',priceZone:'Metropolitana',fuelPrice:1300,fuelPriceManual:false,kwhPrice:220,batteryKwh:0,chargeKw:2,chargeStart:20,chargeEnd:80,navApp:'waze',dataMonthly:12000,hoursMonthly:200,goal:5000,investment:2850000}, jobs:[], refuels:[], shiftActive:false, nextOfferAt:0, speed:0, offerCursor:0, pendingOffer:null, activeDelivery:null }; }
   function load() {
     if (DEMO || DIRECT) return { ...defaults(), jobs:seedHistory() };
     try {
@@ -106,7 +106,7 @@
         if (raw.jobs.some(j=>j.id?.startsWith('seed-13-')) && !raw.jobs.some(j=>j.id?.startsWith('seed-14-'))) {
           raw.jobs = [...seedHistory().filter(j=>j.date<dayAgo(13)), ...raw.jobs];
         }
-        return { ...defaults(), ...raw, settings:{...defaults().settings,...raw.settings}, onboarded: Boolean(raw.onboarded && raw.profile), speed:0 };
+        return { ...defaults(), ...raw, refuels:Array.isArray(raw.refuels)?raw.refuels:[], settings:{...defaults().settings,...raw.settings}, onboarded: Boolean(raw.onboarded && raw.profile), speed:0 };
       }
     } catch (_) { /* El prototipo sigue funcionando si el almacenamiento está deshabilitado. */ }
     return defaults();
@@ -130,6 +130,7 @@
   let routeData = null;
   let routeStatus = 'Toca “Crear ruta con mi GPS” para ver un trayecto real por calles.';
   let routeLoading = false;
+  let refuelStation = '';
   let routeWait = 0;
   let routeZoom = null;
   let routeCursor = -1;
@@ -177,7 +178,39 @@
   }
   function head(showSafety=true) { return `<header class="top"><div class="brand"><span class="brand-ic">${icon('arrow')}</span><span>Última Milla</span></div><div class="top-right"><span class="demo-pill">MODO DEMO<small class="network-label">${online?'EN LÍNEA':'SIN INTERNET'}</small></span>${showSafety?`<button class="icon-btn" data-action="speed" aria-label="Probar bloqueo por movimiento" title="Probar bloqueo por movimiento">${icon('shield')}</button>`:''}</div></header>`; }
   function nav() { return `<nav class="tabbar" aria-label="Navegación principal">${[['inicio','home','Inicio'],['oferta','offer','Oferta'],['resumen','summary','Resumen'],['mapa','map','Mapa'],['vehiculo','settings','Ajustes']].map(([id,ic,label])=>`<button class="tab ${screen===id?'pop':''}" data-screen="${id}" aria-label="${label}" ${screen===id?'aria-current="page"':''}>${icon(ic)}<span>${label}</span>${id==='oferta'&&currentOffer?'<i class="badge" aria-hidden="true"></i>':''}</button>`).join('')}</nav>`; }
-  function shell(content) { if (screen==='inicio' && state.profile?.name) content=content.replace('Hola, Luis.',`Hola, ${escapeHtml(state.profile.name.split(/\s+/)[0])}.`); if(screen==='vehiculo') { const page=content.replace(/^<div>.*?<\/div>/,'').replace('<h2>Vehículo</h2>',`<h2>Vehículo</h2><p class="note">En uso: ${escapeHtml(vehicle().name)}</p>`); content=settingsExtras()+page.replace('</section>',`</section>${customVehicleEditor()}`); } return `<div class="shell" ${state.speed>10?'inert':''}><a class="skip-link" href="#main">Ir al contenido</a>${head()}<main class="scroll" id="main" tabindex="-1"><div class="${lastScreen!==screen?'enter ':''}stack">${content}</div></main>${nav()}</div>${state.speed>10?security():''}<div class="toast-region" role="status" aria-live="polite"></div>`; }
+  function shiftCard() {
+    return `<section class="card live-card"><div class="section-head"><h2><span class="live-dot ${state.shiftActive?'on':''}"></span>Turno ${state.shiftActive?'activo':'en pausa'}</h2><span class="aside">DEMO</span></div><p class="note">${state.shiftActive?'Llegarán ofertas de ejemplo de tus plataformas conectadas.':'Activa el turno para recibir ofertas de ejemplo.'} No lee notificaciones ni pedidos reales.</p><button class="btn ${state.shiftActive?'outline':'primary'} block" data-action="${state.shiftActive?'shift-pause':'shift-start'}" style="margin-top:12px">${state.shiftActive?'Pausar turno':'Iniciar turno'}</button></section>`;
+  }
+  function refuelSummary() {
+    if (vehicle().type!=='fuel') return '';
+    const last=state.refuels.at(-1);
+    return `<section class="card refuel-card"><div class="section-head"><h2>Cargas de combustible</h2><span class="aside">${state.refuels.length} registradas</span></div><p class="note">${last?`Última: ${money(last.amount)} · ${last.liters.toLocaleString('es-CL')} l · ${escapeHtml(last.station)}.`:'Registra una carga al salir de la estación.'}</p><button class="btn outline block" data-screen="carga" style="margin-top:12px">Registrar carga ${icon('arrow','sm')}</button></section>`;
+  }
+  function fuelLedger() {
+    if (!state.refuels.length) return '';
+    const recent=state.refuels.slice(-5).reverse();
+    const total=state.refuels.reduce((sum,item)=>sum+item.amount,0);
+    return `<section class="card"><div class="section-head"><h2>Cargas registradas</h2><span class="aside">${money(total)} en total</span></div><p class="note" style="margin:8px 0">Gasto pagado, separado del costo estimado por km de cada pedido.</p>${recent.map(item=>`<div class="row"><span class="dot green"></span><span class="main"><span class="t1">${escapeHtml(item.station)}</span><span class="t2">${new Date(item.at).toLocaleDateString('es-CL')} · ${Number(item.liters).toLocaleString('es-CL')} l · ${escapeHtml(item.grade)} octanos</span></span><span class="amt">${money(item.amount)}</span></div>`).join('')}</section>`;
+  }
+  function incomingBanner() {
+    if (!currentOffer || screen==='oferta') return '';
+    return `<button class="incoming-banner" data-screen="oferta"><span class="live-dot on"></span><span><strong>Oferta de ${escapeHtml(currentOffer.platform)}</strong><small>${escapeHtml(currentOffer.restaurant)} · Toca para revisar</small></span>${icon('arrow','sm')}</button>`;
+  }
+  function shell(content) {
+    if (screen==='inicio') {
+      if(state.profile?.name) content=content.replace('Hola, Luis.',`Hola, ${escapeHtml(state.profile.name.split(/\s+/)[0])}.`);
+      content=content.replace('</section><div class="decide">',`</section>${shiftCard()}<div class="decide">`);
+      content=content.replace('</section><section><div class="section-head"><h2>Actividad reciente',`</section>${refuelSummary()}<section><div class="section-head"><h2>Actividad reciente`);
+    }
+    if(screen==='vehiculo') {
+      const page=content.replace(/^<div>.*?<\/div>/,'').replace('<h2>Vehículo</h2>',`<h2>Vehículo</h2><p class="note">En uso: ${escapeHtml(vehicle().name)}</p>`);
+      content=settingsExtras()+page.replace('</section>',`</section>${customVehicleEditor()}`);
+    }
+    if(screen==='resumen') content+=fuelLedger();
+    content=content.replace('Si cargas a otro precio, escríbelo en Ajustes. El GPS de esta demo solo sirve para rutas en Santiago; no detecta la estación.','Al registrar una carga, el precio real por litro actualiza tus próximos cálculos.');
+    content=content.replace('El GPS se usa solo cuando creas una ruta.','El GPS se usa solo cuando creas una ruta o buscas una estación.');
+    return `<div class="shell" ${state.speed>10?'inert':''}><a class="skip-link" href="#main">Ir al contenido</a>${head()}<main class="scroll" id="main" tabindex="-1"><div class="${lastScreen!==screen?'enter ':''}stack">${incomingBanner()}${content}</div></main>${nav()}</div>${state.speed>10?security():''}<div class="toast-region" role="status" aria-live="polite"></div>`;
+  }
   function onboarding() {
     const step = introStep;
     const title = ['Tu turno empieza aquí.', 'Elige las plataformas.', 'Cada kilómetro cuenta.'][step];
@@ -351,11 +384,16 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     const fields=[...energyFields,['dataMonthly','Datos móviles','al mes',0,100000,100],['hoursMonthly','Horas de trabajo','al mes',1,400,1],['goal','Meta neta','por hora',1,100000,100],['investment','Invertido en el vehículo','total',0,100000000,1000]];
     return `<div><p class="kicker">Tus costos reales</p><h1 class="title" id="page-title" tabindex="-1">Tu vehículo, tus números</h1><p class="lead">Partimos con valores de ejemplo. Ajústalos cuando quieras.</p></div><section class="card"><h2>Vehículo</h2>${vehiclePicker()}<p class="note">Modelos orientativos disponibles en Chile; no representan un ranking de repartidores.</p><p class="note" style="margin-top:10px">${v.type==='human'?'Sin combustible':`${v.consumption} ${v.unit}`} · ${money(v.maintenance)}/km en mantención estimada.</p></section>${v.type==='fuel'?fuelCard():''}<section class="card"><h2>Valores para calcular</h2><div class="fields" style="margin-top:12px">${fields.map(([key,label,suffix,min,max,step])=>`<div class="field"><label for="setting-${key}">${label}</label><div class="input-wrap"><span class="pre" aria-hidden="true">${['hoursMonthly','batteryKwh','chargeKw','chargeStart','chargeEnd'].includes(key)?'':'$'}</span><input id="setting-${key}" type="text" inputmode="${step===0.1?'decimal':'numeric'}" min="${min}" max="${max}" step="${step}" data-setting="${key}" value="${Number(state.settings[key]).toLocaleString('es-CL')}" aria-describedby="hint-${key}"><span class="suf" aria-hidden="true">${suffix}</span></div><p class="hint" id="hint-${key}">Valor editable; se guarda solo aquí.</p></div>`).join('')}</div><p class="note" style="margin-top:14px">Semáforo: verde si llega a tu meta; amarillo entre 90 % y 99 %; rojo bajo 90 %.</p></section>${v.type==='electric'?chargeCard():''}<section class="card"><h2>Inversión</h2><dl class="inv-grid"><div><dt>Invertido</dt><dd>${money(investment)}</dd></div><div><dt>Neto acumulado</dt><dd>${money(net)}</dd></div><div><dt>Por recuperar*</dt><dd>${money(remaining)}</dd></div></dl><div class="progress grow"><span style="width:${progress}%"></span></div><p class="note" style="margin-top:10px">* Comparación ilustrativa, no amortización contable.</p></section><section class="card"><h2>Demostración y seguridad</h2><p class="note">Velocidad simulada: ${state.speed} km/h.</p><div class="btn-col" style="margin-top:12px"><button class="btn outline block" data-action="speed">Probar bloqueo a 15 km/h</button><button class="btn danger block" data-action="reset">Borrar mis datos locales</button></div></section><p class="note center">Sin cuentas en línea. El GPS se usa solo cuando creas una ruta. Los cambios se guardan en este navegador.</p>`;
   }
+  function refuelPage() {
+    if (vehicle().type!=='fuel') return `<div><h1 class="title" id="page-title" tabindex="-1">No necesitas bencina</h1><p class="lead">Tu vehículo usa ${vehicle().type==='electric'?'electricidad':'energía humana'}.</p></div><button class="btn outline block" data-screen="inicio">Volver al inicio</button>`;
+    return `<div><p class="kicker">Gasto real · ${escapeHtml(vehicle().name)}</p><h1 class="title" id="page-title" tabindex="-1">Registrar carga</h1><p class="lead">Anota cuánto cargaste y pagaste. El precio por litro se calculará solo.</p></div><section class="card"><h2>¿Dónde cargaste?</h2><p class="note" style="margin:8px 0 12px">Escribe la estación donde acabas de cargar.</p><form id="refuel-form" class="signup-form" style="margin-top:16px"><label for="refuel-station">Estación</label><input id="refuel-station" name="station" autocomplete="off" maxlength="80" placeholder="Ej.: Copec, Providencia" value="${escapeHtml(refuelStation)}" required><label for="refuel-grade">Octanaje cargado</label><select id="refuel-grade" name="grade" required>${['93','95','97'].map(g=>`<option value="${g}" ${state.settings.fuelGrade===g?'selected':''}>${g} octanos</option>`).join('')}</select><label for="refuel-liters">Litros cargados</label><input id="refuel-liters" name="liters" inputmode="decimal" type="number" min="0.1" max="200" step="0.01" placeholder="Ej.: 8,5" required><label for="refuel-amount">Total pagado ($)</label><input id="refuel-amount" name="amount" inputmode="numeric" type="number" min="100" max="1000000" step="1" placeholder="Ej.: 11000" required><p class="note">Se guardará como gasto real. En el análisis de pedidos el combustible sigue siendo estimado por km; no se descuenta 2 veces.</p><button class="btn primary block" type="button" data-action="refuel-save">Guardar carga</button></form></section><button class="btn outline block" data-screen="inicio">Volver al inicio</button>`;
+  }
   function security() { return `<div class="security" role="alertdialog" aria-modal="true" aria-labelledby="security-title" aria-describedby="security-desc"><div class="sec-card"><span class="sec-icon">${icon('shield','lg')}</span><h2 id="security-title">Primero, detente</h2><p id="security-desc">Sobre 10 km/h bloqueamos los botones. Tu seguridad va primero.</p><div class="sec-speed">${state.speed}<small>km/h</small></div><button class="btn lime big block" data-action="stop">Simular detención</button><p>Control simulado: no usa GPS.</p></div></div>`; }
   function render() {
+    if (screen==='carga' && vehicle().type!=='fuel') screen='vehiculo';
     const oldScroll=document.getElementById('main')?.scrollTop||0;
     const changed=lastScreen!==screen;
-    const markup=!state.onboarded?onboarding():shell(({inicio:home,oferta:offerPage,resumen:summary,mapa:routePage,vehiculo:vehiclePage})[screen]());
+    const markup=!state.onboarded?onboarding():shell(({inicio:home,oferta:offerPage,resumen:summary,mapa:routePage,vehiculo:vehiclePage,carga:refuelPage})[screen]());
     app.innerHTML=markup.replace(/(\d+)\.(\d+)(?=\s*km\b)/g,'$1,$2');
     const main=document.getElementById('main');
     const customForm=document.getElementById('custom-vehicle-form');
@@ -404,18 +442,30 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     if (index==null && !available.length) { screen='vehiculo';render();toast('Activa una plataforma de ejemplo en Ajustes.',true);return; }
     currentOffer={...(index==null?available[state.offerCursor++%available.length]:OFFERS[index])}; screen='oferta'; save();render();
   }
+  function scheduleNextOffer() {
+    state.nextOfferAt=Date.now()+18000+Math.floor(Math.random()*12000);
+  }
+  function tickShift() {
+    if (!state.shiftActive || !state.onboarded || currentOffer || acceptedOffer || !online || document.visibilityState==='hidden' || screen==='vehiculo' || screen==='carga' || state.speed>10 || Date.now()<state.nextOfferAt) return;
+    const available=OFFERS.filter(o=>state.connected.includes(o.platform));
+    if (!available.length) return;
+    currentOffer={...available[state.offerCursor++%available.length]};
+    scheduleNextOffer();save();render();
+    if (navigator.vibrate) navigator.vibrate([80,50,80]);
+    toast(`Nueva oferta de ejemplo: ${currentOffer.platform}`);
+  }
   function finishDelivery() {
     if(!acceptedOffer)return;
     const observed=waitStart>0;
     const waitMin=observed?Math.max(0,Math.round((Date.now()-waitStart)/60000)):acceptedOffer.waitMin;
     const calc=calculateOffer({...acceptedOffer,waitMin},vehicle(),state.settings);
     state.jobs.push({id:`live-${Date.now()}`,date:today(),time:new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'}),platform:acceptedOffer.platform,restaurant:acceptedOffer.restaurant,from:acceptedOffer.from,to:acceptedOffer.to,status:'completed',waitSource:observed?'medida':'estimada',...calc});
-    acceptedOffer=null;acceptedCalc=null;currentOffer=null;waitStart=0;screen='inicio';save();render();toast('Entrega registrada automáticamente.');
+    acceptedOffer=null;acceptedCalc=null;currentOffer=null;waitStart=0;screen='inicio';scheduleNextOffer();save();render();toast('Entrega de demostración registrada.');
   }
   function rejectOffer() {
     if(!currentOffer)return;
     state.jobs.push({id:`reject-${Date.now()}`,date:today(),time:new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'}),platform:currentOffer.platform,restaurant:currentOffer.restaurant,status:'rejected',gross:0,net:0,totalKm:0,returnKm:0,waitMin:0,totalMinutes:0,signal:calculateOffer(currentOffer,vehicle(),state.settings).signal,fuel:0,maintenance:0,data:0});
-    currentOffer=null;save();render();toast('Oferta rechazada y registrada.');
+    currentOffer=null;scheduleNextOffer();save();render();toast('Oferta rechazada y registrada.');
   }
   app.addEventListener('click',e=>{
     const button=e.target.closest('[data-action],[data-screen],[data-period],[data-vehicle],[data-connect]');
@@ -448,6 +498,18 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
       const fallbackName=type==='electric'?`${group} ${['Moto','Bicicleta'].includes(group)?'eléctrica':'eléctrico'}`:`${group} personalizado`;
       state.customVehicle={id:'custom',group,name:`${brand} ${name||fallbackName}`,brand,model:name,motorW,type,consumption:type==='human'?1:consumption,maintenance,investment,unit:type==='fuel'?'km/l':type==='electric'?'km/kWh':'sin combustible'};
       state.vehicleId='custom';state.settings.investment=investment;save();render();toast('Vehículo personalizado activo.');return;
+    }
+    if(action==='shift-start') { if(!state.connected.length){screen='vehiculo';render();toast('Activa una plataforma de ejemplo.',true);return;}state.shiftActive=true;state.nextOfferAt=Date.now()+6000;save();render();toast('Turno de demostración iniciado.');return; }
+    if(action==='shift-pause') { state.shiftActive=false;save();render();toast('Turno en pausa.');return; }
+    if(action==='refuel-save') {
+      if(vehicle().type!=='fuel')return;
+      const form=document.getElementById('refuel-form');if(!form?.reportValidity())return;
+      const station=form.elements.station.value.trim().replace(/\s+/g,' ');
+      const liters=Number(form.elements.liters.value),amount=Number(form.elements.amount.value),grade=form.elements.grade.value;
+      const unitPrice=Math.round(amount/liters);
+      if(station.length<2||station.length>80||!Number.isFinite(liters)||liters<0.1||liters>200||!Number.isInteger(amount)||amount<100||amount>1000000||unitPrice<100||unitPrice>5000||!['93','95','97'].includes(grade)){toast('Revisa la estación, los litros y el total pagado.',true);return;}
+      state.refuels.push({id:`fuel-${Date.now()}`,at:new Date().toISOString(),station,liters,amount,unitPrice,grade,vehicle:vehicle().name});
+      state.settings.fuelGrade=grade;state.settings.fuelPrice=unitPrice;state.settings.fuelPriceManual=true;refuelStation='';screen='inicio';save();render();toast(`Carga guardada: ${money(amount)} · ${money(unitPrice)}/l.`);return;
     }
     if(action==='simulate'){simulate();return;}
     if(action==='accept'){acceptedOffer=currentOffer;acceptedCalc=calculateOffer(currentOffer,vehicle(),state.settings);currentOffer=null;waitStart=0;save();render();toast('Pedido aceptado. Marca tu llegada al local para medir la espera.');return;}
@@ -495,7 +557,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     if(t.dataset.field==='vehicleId'){state.vehicleId=t.value;state.settings.investment=vehicle().investment;save();render();return;}
     if(t.dataset.setting){const key=t.dataset.setting,raw=t.value.trim()===''?NaN:Number(t.value.replace(/\./g,'').replace(',','.')),lo=Number(t.min),hi=Number(t.max),decimal=['batteryKwh','chargeKw'].includes(key);if(!Number.isFinite(raw)||(!decimal&&!Number.isInteger(raw))||raw<lo||raw>hi){t.setAttribute('aria-invalid','true');t.closest('.field')?.classList.add('invalid');toast(`Ingresa un valor entre ${lo} y ${hi}.`,true);return;}state.settings[key]=raw;if(key==='fuelPrice')state.settings.fuelPriceManual=true;save();render();toast('Valor actualizado.');}
   });
-  app.addEventListener('input',e=>{if(e.target.dataset.setting){e.target.removeAttribute('aria-invalid');e.target.closest('.field')?.classList.remove('invalid');}});
+  app.addEventListener('input',e=>{if(e.target.id==='refuel-station')refuelStation=e.target.value;if(e.target.dataset.setting){e.target.removeAttribute('aria-invalid');e.target.closest('.field')?.classList.remove('invalid');}});
   app.addEventListener('focusin',e=>{if(e.target.dataset.setting)e.target.value=e.target.value.replace(/\./g,'');});
   window.addEventListener('message',e=>{
     if (e.source!==window.parent || !e.data || e.data.tipo!=='simular') return;
@@ -503,7 +565,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     if (!state.onboarded) { state.onboarded=true; state.connected=['Uber Eats','PedidosYa','Rappi']; }
     simulate();
   });
-  setInterval(updateTimer,1000);
+  setInterval(()=>{updateTimer();tickShift();},1000);
   window.addEventListener('online',()=>{online=true;document.querySelectorAll('.network-label').forEach(el=>el.textContent='EN LÍNEA');if(screen==='mapa'&&!routeData)render();loadPrices();});
   window.addEventListener('offline',()=>{online=false;document.querySelectorAll('.network-label').forEach(el=>el.textContent='SIN INTERNET');if(screen==='mapa'&&!routeData)render();});
   loadPrices();

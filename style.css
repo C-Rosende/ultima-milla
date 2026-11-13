@@ -692,6 +692,18 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .custom-vehicle[open] summary { margin-bottom: 12px; }
 .custom-vehicle[open] summary .ic { transform: rotate(45deg); }
 .custom-vehicle .note { margin: 4px 0 6px; }
+.live-card, .refuel-card { border: 1px solid var(--line-2); }
+.live-card .section-head, .refuel-card .section-head { margin-bottom: 8px; }
+.live-card .section-head h2 { display: flex; align-items: center; gap: 8px; }
+.live-dot { display: inline-block; width: 9px; height: 9px; flex: none; border-radius: 50%; background: #9aaa9d; }
+.live-dot.on { background: var(--green-fill); box-shadow: 0 0 0 4px rgba(47,157,98,.14); }
+.incoming-banner { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 12px 14px; border: 1px solid var(--green); border-radius: 16px; color: var(--forest); background: #e7f7da; text-align: left; box-shadow: 0 9px 20px -15px #153d29; }
+.incoming-banner span:nth-child(2) { min-width: 0; flex: 1; }
+.incoming-banner strong, .incoming-banner small { display: block; overflow-wrap: anywhere; }
+.incoming-banner small { margin-top: 2px; color: var(--ink-2); font-size: 12px; }
+.refuel-card .note { overflow-wrap: anywhere; }
+.signup-form input[type="number"] { appearance: textfield; }
+.signup-form input[type="number"]::-webkit-inner-spin-button { appearance: none; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .intro :focus-visible, .hero :focus-visible, .sec-card :focus-visible { outline-color: var(--lime); }
 .title:focus-visible, .intro h1:focus-visible, .sec-card h2:focus-visible, .st:focus-visible { outline: none; }
