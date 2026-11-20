@@ -3,42 +3,42 @@
   "product": "Gasolinas 93, 95 y 97 y diésel",
   "unit": "CLP/L",
   "method": "mediana por zona",
-  "fetchedAt": "2026-11-20T03:12:56.428Z",
-  "estaciones": 1750,
+  "fetchedAt": "2026-11-20T20:29:32.639Z",
+  "estaciones": 1753,
   "zonas": {
     "Norte": {
       "93": {
         "mediana": 1651,
-        "n": 211
+        "n": 212
       },
       "95": {
         "mediana": 1686,
-        "n": 209
+        "n": 210
       },
       "97": {
         "mediana": 1716,
-        "n": 202
+        "n": 203
       },
       "diesel": {
-        "mediana": 1552,
-        "n": 222
+        "mediana": 1550,
+        "n": 223
       }
     },
     "Centro": {
       "93": {
-        "mediana": 1584,
-        "n": 686
+        "mediana": 1583,
+        "n": 687
       },
       "95": {
-        "mediana": 1622,
+        "mediana": 1621,
         "n": 681
       },
       "97": {
-        "mediana": 1662,
+        "mediana": 1661,
         "n": 554
       },
       "diesel": {
-        "mediana": 1486,
+        "mediana": 1484,
         "n": 695
       }
     },
@@ -48,7 +48,7 @@
         "n": 483
       },
       "95": {
-        "mediana": 1588,
+        "mediana": 1587,
         "n": 486
       },
       "97": {
@@ -56,14 +56,14 @@
         "n": 448
       },
       "diesel": {
-        "mediana": 1463,
+        "mediana": 1460,
         "n": 487
       }
     },
     "Sur": {
       "93": {
         "mediana": 1628,
-        "n": 335
+        "n": 336
       },
       "95": {
         "mediana": 1657,
@@ -74,7 +74,7 @@
         "n": 305
       },
       "diesel": {
-        "mediana": 1530,
+        "mediana": 1529,
         "n": 342
       }
     }
