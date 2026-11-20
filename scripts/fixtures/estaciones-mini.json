@@ -1,0 +1,1396 @@
+{
+ "data": [
+  {
+   "id": 1572,
+   "marca": 4,
+   "direccion": "BRASIL 154",
+   "latitud": "-33,44241788189269",
+   "longitud": "-70,66533923149109",
+   "region": "Metropolitana de Santiago",
+   "comuna": "Santiago Centro",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1523.000",
+     "precio_fecha": "2026-11-19 10:20:43"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "16710.000",
+     "precio_fecha": "2026-11-19 10:20:43"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1477.000",
+     "precio_fecha": "2026-11-19 10:20:44"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1564.000",
+     "precio_fecha": "2026-11-19 10:20:43"
+    }
+   ]
+  },
+  {
+   "id": 1553,
+   "marca": 5,
+   "direccion": "BASCUÑAN GUERRERO 568",
+   "latitud": "-33.45679675716567",
+   "longitud": "-70.67388206720352",
+   "region": "Metropolitana de Santiago",
+   "comuna": "Santiago Centro",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "A93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1530.000",
+     "precio_fecha": "2026-11-19 06:56:51"
+    },
+    {
+     "nombre_corto": "A95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1562.000",
+     "precio_fecha": "2026-11-19 06:56:51"
+    },
+    {
+     "nombre_corto": "A97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1610.000",
+     "precio_fecha": "2026-11-19 06:56:51"
+    },
+    {
+     "nombre_corto": "ADI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1451.000",
+     "precio_fecha": "2026-11-19 06:56:51"
+    }
+   ]
+  },
+  {
+   "id": 1628,
+   "marca": 4,
+   "direccion": "Matucana 30",
+   "latitud": "-33.448129434154865",
+   "longitud": "-70.67941009998322",
+   "region": "Metropolitana de Santiago",
+   "comuna": "Estación Central",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1523.000",
+     "precio_fecha": "2026-11-19 10:21:02"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1608.000",
+     "precio_fecha": "2026-11-19 10:21:02"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1477.000",
+     "precio_fecha": "2026-11-19 20:20:46"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1564.000",
+     "precio_fecha": "2026-11-19 10:21:02"
+    },
+    {
+     "nombre_corto": "A93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1517.000",
+     "precio_fecha": "2026-11-19 10:21:02"
+    },
+    {
+     "nombre_corto": "A95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1558.000",
+     "precio_fecha": "2026-11-19 10:21:02"
+    },
+    {
+     "nombre_corto": "A97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1602.000",
+     "precio_fecha": "2026-11-19 10:21:02"
+    },
+    {
+     "nombre_corto": "ADI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1471.000",
+     "precio_fecha": "2026-11-19 20:20:46"
+    }
+   ]
+  },
+  {
+   "id": 71,
+   "marca": 5,
+   "direccion": "SAN MARTIN ESQ. URIBE 0",
+   "latitud": "-23.64914089749835",
+   "longitud": "-70.40098875761032",
+   "region": "Antofagasta",
+   "comuna": "Antofagasta",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1669.000",
+     "precio_fecha": "2026-11-19 08:39:38"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1730.000",
+     "precio_fecha": "2026-11-19 08:39:38"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1554.000",
+     "precio_fecha": "2026-11-19 08:39:38"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1702.000",
+     "precio_fecha": "2026-11-19 08:39:38"
+    },
+    {
+     "nombre_corto": "A95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1687.000",
+     "precio_fecha": "2026-11-19 08:39:38"
+    },
+    {
+     "nombre_corto": "ADI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1539.000",
+     "precio_fecha": "2026-11-19 08:39:38"
+    },
+    {
+     "nombre_corto": "A93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1654.000",
+     "precio_fecha": "2026-11-19 08:39:38"
+    },
+    {
+     "nombre_corto": "A97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1715.000",
+     "precio_fecha": "2026-11-19 08:39:38"
+    }
+   ]
+  },
+  {
+   "id": 95,
+   "marca": 4,
+   "direccion": "Balmaceda 2408",
+   "latitud": "-23.64688047984547",
+   "longitud": "-70.40094316005707",
+   "region": "Antofagasta",
+   "comuna": "Antofagasta",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1669.000",
+     "precio_fecha": "2026-11-19 10:20:58"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1730.000",
+     "precio_fecha": "2026-11-19 10:20:58"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1554.000",
+     "precio_fecha": "2026-11-19 20:20:44"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1702.000",
+     "precio_fecha": "2026-11-19 10:20:58"
+    },
+    {
+     "nombre_corto": "A93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1654.000",
+     "precio_fecha": "2026-11-19 10:20:58"
+    },
+    {
+     "nombre_corto": "A97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1715.000",
+     "precio_fecha": "2026-11-19 10:20:58"
+    },
+    {
+     "nombre_corto": "ADI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1539.000",
+     "precio_fecha": "2026-11-19 20:20:44"
+    },
+    {
+     "nombre_corto": "A95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1687.000",
+     "precio_fecha": "2026-11-19 10:20:58"
+    }
+   ]
+  },
+  {
+   "id": 85,
+   "marca": 151,
+   "direccion": "Av. Argentina 2802",
+   "latitud": "-23.64912615577059",
+   "longitud": "-70.39278119802475",
+   "region": "Antofagasta",
+   "comuna": "Antofagasta",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1671.000",
+     "precio_fecha": "2026-11-19 10:30:17"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1732.000",
+     "precio_fecha": "2026-11-19 17:52:58"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1556.000",
+     "precio_fecha": "2026-11-19 10:30:17"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1704.000",
+     "precio_fecha": "2026-11-19 10:30:17"
+    }
+   ]
+  },
+  {
+   "id": 1140,
+   "marca": 5,
+   "direccion": "GRAL. MACKENNA, ESQ. VARAS 712",
+   "latitud": "-38.741127196266284",
+   "longitud": "-72.58715406060219",
+   "region": "De la Araucanía",
+   "comuna": "Temuco",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1608.000",
+     "precio_fecha": "2026-11-19 00:00:04"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1665.000",
+     "precio_fecha": "2026-11-19 00:00:04"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1507.000",
+     "precio_fecha": "2026-11-19 00:00:04"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1638.000",
+     "precio_fecha": "2026-11-19 00:00:04"
+    }
+   ]
+  },
+  {
+   "id": 1160,
+   "marca": 151,
+   "direccion": "Gral. Mackenna 699",
+   "latitud": "-38.74092112676336",
+   "longitud": "-72.58675575256348",
+   "region": "De la Araucanía",
+   "comuna": "Temuco",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1609.000",
+     "precio_fecha": "2026-11-19 12:08:09"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1665.000",
+     "precio_fecha": "2026-11-19 12:08:09"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1508.000",
+     "precio_fecha": "2026-11-19 12:08:09"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1638.000",
+     "precio_fecha": "2026-11-19 12:08:09"
+    }
+   ]
+  },
+  {
+   "id": 1170,
+   "marca": 4,
+   "direccion": "Bulnes 195",
+   "latitud": "-38.73063154013328",
+   "longitud": "-72.58692741394043",
+   "region": "De la Araucanía",
+   "comuna": "Temuco",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1600.000",
+     "precio_fecha": "2026-11-19 13:05:46"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1670.000",
+     "precio_fecha": "2026-11-19 13:05:46"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1502.000",
+     "precio_fecha": "2026-11-19 20:20:41"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1636.000",
+     "precio_fecha": "2026-11-19 10:20:50"
+    },
+    {
+     "nombre_corto": "A93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1585.000",
+     "precio_fecha": "2026-11-19 13:05:46"
+    },
+    {
+     "nombre_corto": "A95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1621.000",
+     "precio_fecha": "2026-11-19 10:20:50"
+    },
+    {
+     "nombre_corto": "A97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1655.000",
+     "precio_fecha": "2026-11-19 13:05:46"
+    },
+    {
+     "nombre_corto": "ADI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1487.000",
+     "precio_fecha": "2026-11-19 20:20:41"
+    }
+   ]
+  },
+  {
+   "id": 282,
+   "marca": 5,
+   "direccion": "CHACABUCO, GENERAL CRUZ 0",
+   "latitud": "-33.046227277175646",
+   "longitud": "-71.61313533782959",
+   "region": "Valparaíso",
+   "comuna": "Valparaíso",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1465.000",
+     "precio_fecha": "2026-11-19 09:04:13"
+    },
+    {
+     "nombre_corto": "A93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1513.000",
+     "precio_fecha": "2026-11-19 09:04:13"
+    },
+    {
+     "nombre_corto": "A95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1567.000",
+     "precio_fecha": "2026-11-19 09:04:13"
+    },
+    {
+     "nombre_corto": "A97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1634.000",
+     "precio_fecha": "2026-11-19 09:04:13"
+    },
+    {
+     "nombre_corto": "ADI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1454.000",
+     "precio_fecha": "2026-11-19 09:04:13"
+    }
+   ]
+  },
+  {
+   "id": 278,
+   "marca": 5,
+   "direccion": "AV. COLÓN 2330",
+   "latitud": "-33.049891946874915",
+   "longitud": "-71.6126149892807",
+   "region": "Valparaíso",
+   "comuna": "Valparaíso",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1528.000",
+     "precio_fecha": "2026-11-19 00:01:50"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1649.000",
+     "precio_fecha": "2026-11-19 00:01:50"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1469.000",
+     "precio_fecha": "2026-11-19 00:01:50"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1582.000",
+     "precio_fecha": "2026-11-19 00:01:50"
+    }
+   ]
+  },
+  {
+   "id": 295,
+   "marca": 151,
+   "direccion": "Chacabuco esq. Rodríguez 0",
+   "latitud": "-33.04596647278344",
+   "longitud": "-71.61583364009857",
+   "region": "Valparaíso",
+   "comuna": "Valparaíso",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1529.000",
+     "precio_fecha": "2026-11-19 08:08:58"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1649.000",
+     "precio_fecha": "2026-11-19 08:08:58"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1470.000",
+     "precio_fecha": "2026-11-19 08:08:58"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1582.000",
+     "precio_fecha": "2026-11-19 08:08:58"
+    }
+   ]
+  },
+  {
+   "id": 1357,
+   "marca": 5,
+   "direccion": "San MartÍn, Esq. Benavente 0",
+   "latitud": "-41.47083695536421",
+   "longitud": "-72.94048547744751",
+   "region": "De los Lagos",
+   "comuna": "Puerto Montt",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "A93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1601.000",
+     "precio_fecha": "2026-11-19 09:56:28"
+    },
+    {
+     "nombre_corto": "A95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1627.000",
+     "precio_fecha": "2026-11-19 09:56:28"
+    },
+    {
+     "nombre_corto": "A97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1657.000",
+     "precio_fecha": "2026-11-19 09:56:28"
+    },
+    {
+     "nombre_corto": "ADI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1515.000",
+     "precio_fecha": "2026-11-19 09:56:28"
+    }
+   ]
+  },
+  {
+   "id": 1375,
+   "marca": 151,
+   "direccion": "Benavente 680",
+   "latitud": "-41.471489074985136",
+   "longitud": "-72.94484951231377",
+   "region": "De los Lagos",
+   "comuna": "Puerto Montt",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1616.000",
+     "precio_fecha": "2026-11-19 17:57:36"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1672.000",
+     "precio_fecha": "2026-11-19 09:29:23"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1530.000",
+     "precio_fecha": "2026-11-19 09:29:23"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1642.000",
+     "precio_fecha": "2026-11-19 09:29:23"
+    },
+    {
+     "nombre_corto": "A93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1601.000",
+     "precio_fecha": "2026-11-19 17:57:36"
+    },
+    {
+     "nombre_corto": "A95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1627.000",
+     "precio_fecha": "2026-11-19 09:29:23"
+    },
+    {
+     "nombre_corto": "A97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1657.000",
+     "precio_fecha": "2026-11-19 09:29:23"
+    },
+    {
+     "nombre_corto": "ADI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1515.000",
+     "precio_fecha": "2026-11-19 09:29:23"
+    }
+   ]
+  },
+  {
+   "id": 1382,
+   "marca": 4,
+   "direccion": "Quillota 218",
+   "latitud": "-41.47047921707075",
+   "longitud": "-72.93836116790771",
+   "region": "De los Lagos",
+   "comuna": "Puerto Montt",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1616.000",
+     "precio_fecha": "2026-11-19 12:35:48"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1672.000",
+     "precio_fecha": "2026-11-19 12:35:48"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1530.000",
+     "precio_fecha": "2026-11-19 10:20:55"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1642.000",
+     "precio_fecha": "2026-11-19 10:20:55"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "marca": 5,
+   "direccion": "AV. DIEGO PORTALES 1072",
+   "latitud": "-18.47414466085023",
+   "longitud": "-70.30325710773468",
+   "region": "Arica y Parinacota",
+   "comuna": "Arica",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1651.000",
+     "precio_fecha": "2026-11-19 00:12:55"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1707.000",
+     "precio_fecha": "2026-11-19 00:12:55"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1549.000",
+     "precio_fecha": "2026-11-19 00:12:55"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1681.000",
+     "precio_fecha": "2026-11-19 00:12:55"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "marca": 5,
+   "direccion": "SAN MARTÍN 699",
+   "latitud": "-18.4798481827338",
+   "longitud": "-70.3134173154831",
+   "region": "Arica y Parinacota",
+   "comuna": "Arica",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1651.000",
+     "precio_fecha": "2026-11-19 08:50:19"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1707.000",
+     "precio_fecha": "2026-11-19 08:50:19"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1549.000",
+     "precio_fecha": "2026-11-19 08:50:19"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1681.000",
+     "precio_fecha": "2026-11-19 08:50:19"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "marca": 5,
+   "direccion": "PANAMERICANA SUR 2824",
+   "latitud": "-18.49350330167479",
+   "longitud": "-70.28909504413605",
+   "region": "Arica y Parinacota",
+   "comuna": "Arica",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1658.000",
+     "precio_fecha": "2026-11-19 09:03:29"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1710.000",
+     "precio_fecha": "2026-11-19 09:03:29"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1552.000",
+     "precio_fecha": "2026-11-19 09:03:29"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1686.000",
+     "precio_fecha": "2026-11-19 09:03:29"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "marca": 5,
+   "direccion": " LUIS VALENTE ROSSI 1990",
+   "latitud": "-18.490415223567965",
+   "longitud": "-70.30229687690735",
+   "region": "Arica y Parinacota",
+   "comuna": "Arica",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1643.000",
+     "precio_fecha": "2026-11-19 00:32:48"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1698.000",
+     "precio_fecha": "2026-11-19 00:32:48"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1541.000",
+     "precio_fecha": "2026-11-19 00:32:48"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1673.000",
+     "precio_fecha": "2026-11-19 00:32:48"
+    }
+   ]
+  },
+  {
+   "id": 484,
+   "marca": 151,
+   "direccion": "Avenida Palmira Romano Oriente 211",
+   "latitud": "-32.990493716787405",
+   "longitud": "-71.26372396945953",
+   "region": "Valparaíso",
+   "comuna": "Limache",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1621.000",
+     "precio_fecha": "2026-11-12 19:41:02"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1620.000",
+     "precio_fecha": "2026-11-12 19:41:02"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1663.000",
+     "precio_fecha": "2026-11-12 19:41:02"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1702.000",
+     "precio_fecha": "2026-11-12 19:41:02"
+    },
+    {
+     "nombre_corto": "A93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1606.000",
+     "precio_fecha": "2026-11-12 19:41:02"
+    },
+    {
+     "nombre_corto": "A95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1603.000",
+     "precio_fecha": "2026-10-29 13:02:16"
+    },
+    {
+     "nombre_corto": "A97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1687.000",
+     "precio_fecha": "2026-11-12 19:41:02"
+    },
+    {
+     "nombre_corto": "ADI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1605.000",
+     "precio_fecha": "2026-11-12 19:41:02"
+    }
+   ]
+  },
+  {
+   "id": 276,
+   "marca": 5,
+   "direccion": "AV. BRASIL 2641",
+   "latitud": "-33.04451854469839",
+   "longitud": "-71.60812497138977",
+   "region": "Valparaíso",
+   "comuna": "Valparaíso",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1528.000",
+     "precio_fecha": "2026-11-18 23:58:19"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1649.000",
+     "precio_fecha": "2026-11-18 23:58:19"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1469.000",
+     "precio_fecha": "2026-11-18 23:58:19"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1582.000",
+     "precio_fecha": "2026-11-18 23:58:19"
+    }
+   ]
+  },
+  {
+   "id": 277,
+   "marca": 5,
+   "direccion": "SANTOS OSSA 960",
+   "latitud": "-33.05312707147948",
+   "longitud": "-71.60112172365189",
+   "region": "Valparaíso",
+   "comuna": "Valparaíso",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1528.000",
+     "precio_fecha": "2026-11-19 00:06:07"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1649.000",
+     "precio_fecha": "2026-11-19 00:06:07"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1465.000",
+     "precio_fecha": "2026-11-19 00:06:07"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1582.000",
+     "precio_fecha": "2026-11-19 00:06:07"
+    }
+   ]
+  },
+  {
+   "id": 1543,
+   "marca": 5,
+   "direccion": "Mapocho 1998",
+   "latitud": "-33.43219",
+   "longitud": "-70.66466",
+   "region": "Metropolitana de Santiago",
+   "comuna": "Santiago Centro",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1523.000",
+     "precio_fecha": "2026-11-19 07:09:12"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1608.000",
+     "precio_fecha": "2026-11-19 07:09:12"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1477.000",
+     "precio_fecha": "2026-11-19 07:09:12"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1564.000",
+     "precio_fecha": "2026-11-19 07:09:12"
+    }
+   ]
+  },
+  {
+   "id": 1544,
+   "marca": 5,
+   "direccion": "SAN PABLO 1571",
+   "latitud": "-33.434404960850074",
+   "longitud": "-70.65988898277283",
+   "region": "Metropolitana de Santiago",
+   "comuna": "Santiago Centro",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1523.000",
+     "precio_fecha": "2026-11-19 00:03:16"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1608.000",
+     "precio_fecha": "2026-11-19 00:03:16"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1477.000",
+     "precio_fecha": "2026-11-19 00:03:16"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1564.000",
+     "precio_fecha": "2026-11-19 00:03:16"
+    }
+   ]
+  },
+  {
+   "id": 1545,
+   "marca": 5,
+   "direccion": "Avenida Almirante Blanco Encalada 1899",
+   "latitud": "-33.45651927302834",
+   "longitud": "-70.66068559885025",
+   "region": "Metropolitana de Santiago",
+   "comuna": "Santiago Centro",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1537.000",
+     "precio_fecha": "2026-11-19 10:05:37"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1605.000",
+     "precio_fecha": "2026-11-19 13:49:56"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1455.000",
+     "precio_fecha": "2026-11-19 10:05:37"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1555.000",
+     "precio_fecha": "2026-11-19 13:49:56"
+    }
+   ]
+  },
+  {
+   "id": 1546,
+   "marca": 5,
+   "direccion": "Avenida Matta 788",
+   "latitud": "-33.45907254113782",
+   "longitud": "-70.64504027366638",
+   "region": "Metropolitana de Santiago",
+   "comuna": "Santiago Centro",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "A93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1535.000",
+     "precio_fecha": "2026-11-19 13:05:26"
+    },
+    {
+     "nombre_corto": "A95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1540.000",
+     "precio_fecha": "2026-11-19 13:05:26"
+    },
+    {
+     "nombre_corto": "A97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1590.000",
+     "precio_fecha": "2026-11-19 13:05:26"
+    },
+    {
+     "nombre_corto": "ADI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1387.000",
+     "precio_fecha": "2026-11-19 13:05:26"
+    }
+   ]
+  },
+  {
+   "id": 1137,
+   "marca": 5,
+   "direccion": "RUTA 5 SUR S/N, KM 682 0",
+   "latitud": "-38.71103998741615",
+   "longitud": "-72.55809903144836",
+   "region": "De la Araucanía",
+   "comuna": "Temuco",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1600.000",
+     "precio_fecha": "2026-11-19 13:08:29"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1663.000",
+     "precio_fecha": "2026-11-19 13:08:29"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1501.000",
+     "precio_fecha": "2026-11-19 13:08:29"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1633.000",
+     "precio_fecha": "2026-11-19 13:08:29"
+    }
+   ]
+  },
+  {
+   "id": 1138,
+   "marca": 5,
+   "direccion": "RUDECINDO ORTEGA 02011",
+   "latitud": "-38.71108184648986",
+   "longitud": "-72.55809903144836",
+   "region": "De la Araucanía",
+   "comuna": "Temuco",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1607.000",
+     "precio_fecha": "2026-11-19 00:22:06"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1670.000",
+     "precio_fecha": "2026-11-19 00:22:06"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1509.000",
+     "precio_fecha": "2026-11-19 00:22:07"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1641.000",
+     "precio_fecha": "2026-11-19 00:22:06"
+    }
+   ]
+  },
+  {
+   "id": 1141,
+   "marca": 5,
+   "direccion": "Rudecindo Ortega 1471",
+   "latitud": "-38.71924389746623",
+   "longitud": "-72.56734728813171",
+   "region": "De la Araucanía",
+   "comuna": "Temuco",
+   "en_mantenimiento_bandera": 0,
+   "gasolinera_bandera": 1,
+   "combustibles": [
+    {
+     "nombre_corto": "93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1607.000",
+     "precio_fecha": "2026-11-19 09:04:33"
+    },
+    {
+     "nombre_corto": "97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1670.000",
+     "precio_fecha": "2026-11-19 09:04:33"
+    },
+    {
+     "nombre_corto": "DI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1508.000",
+     "precio_fecha": "2026-11-19 09:04:33"
+    },
+    {
+     "nombre_corto": "95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1641.000",
+     "precio_fecha": "2026-11-19 09:04:33"
+    },
+    {
+     "nombre_corto": "A93",
+     "nombre_largo": "Gasolina 93",
+     "suministra": 1,
+     "precio": "1592.000",
+     "precio_fecha": "2026-11-19 09:04:33"
+    },
+    {
+     "nombre_corto": "A95",
+     "nombre_largo": "Gasolina 95",
+     "suministra": 1,
+     "precio": "1626.000",
+     "precio_fecha": "2026-11-19 09:04:33"
+    },
+    {
+     "nombre_corto": "A97",
+     "nombre_largo": "Gasolina 97",
+     "suministra": 1,
+     "precio": "1655.000",
+     "precio_fecha": "2026-11-19 09:04:33"
+    },
+    {
+     "nombre_corto": "ADI",
+     "nombre_largo": "Petroleo Diesel",
+     "suministra": 1,
+     "precio": "1493.000",
+     "precio_fecha": "2026-11-19 09:04:33"
+    }
+   ]
+  }
+ ]
+}

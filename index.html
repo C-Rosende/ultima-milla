@@ -25,15 +25,14 @@
     <svg class="mark" viewBox="0 0 44 24" aria-hidden="true"><path class="mk-line" d="M9 12h26"/><circle class="mk-a" cx="9" cy="12" r="5.5"/><circle class="mk-b" cx="35" cy="12" r="5.5"/></svg>
     <h2>Última Milla</h2>
     <p>Demo del perfil de Luis, repartidor en moto Honda CB125F con meta de $5.000 por hora.</p>
-    <p>Escribe el pago y los km de un pedido, o toca un ejemplo. La app descuenta bencina, mantención, datos y espera, y te dice si conviene.</p>
+    <p>Escribe el pago y los km de un pedido, o toca un ejemplo. La app descuenta los costos de tu vehículo, los datos y la espera, y te dice si conviene.</p>
     <p class="desk-url">Abre esta demo en tu celular: <code id="demo-url"></code></p>
   </aside>
   <div class="phone" id="phone">
     <div id="app"></div>
   </div>
   <script>document.getElementById('demo-url').textContent = location.origin + location.pathname.replace(/index\.html$/, '');</script>
-  <script src="calc.js"></script>
   <script src="route-map.js"></script>
-  <script src="app.js"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>

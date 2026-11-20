@@ -1,23 +1,35 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseCsv, extractPrices } from './update-fuel-prices.mjs';
+import { readFileSync } from 'node:fs';
+import { construirPrecios, SOURCE } from './update-fuel-prices.mjs';
 
-test('lee comillas, comas y CRLF del archivo oficial', () => {
-  const rows = parseCsv('zona_geografica_nombre,precio_promedio,extra\r\n"Metropolitana",1575.4,"1,8"\r\n');
-  assert.deepEqual(rows, [{ zona_geografica_nombre: 'Metropolitana', precio_promedio: '1575.4', extra: '1,8' }]);
+const fixture = JSON.parse(readFileSync(new URL('./fixtures/estaciones-mini.json', import.meta.url), 'utf8'));
+
+test('escribe medianas por zona de 93, 95, 97 y diésel con fecha, sin red', () => {
+  const datos = construirPrecios(fixture, '2026-11-19T00:00:00.000Z', { minEstaciones: 10 });
+  assert.equal(datos.source, SOURCE);
+  assert.equal(datos.fetchedAt, '2026-11-19T00:00:00.000Z');
+  assert.equal(datos.unit, 'CLP/L');
+  for (const zona of ['Norte', 'Centro', 'Metropolitana', 'Sur']) {
+    for (const combustible of ['93', '95', '97', 'diesel']) {
+      const m = datos.zonas[zona][combustible];
+      assert.ok(m.mediana > 1000 && m.mediana < 2500, `${zona} ${combustible}: ${m?.mediana}`);
+      assert.ok(m.n >= 1);
+    }
+  }
 });
 
-test('rechaza datos incompletos en vez de publicar un precio erróneo', () => {
-  assert.throws(() => extractPrices([]), /Falta Gasolina 93/);
+test('el error de digitación del fixture (97 a 16.710) no infla la mediana', () => {
+  const datos = construirPrecios(fixture, '2026-11-19T00:00:00.000Z', { minEstaciones: 10 });
+  assert.ok(datos.zonas.Metropolitana['97'].mediana < 2500);
 });
 
-test('separa el precio por octanaje aunque el nombre corto varíe', () => {
-  const rows = ['Zona Norte', 'Zona Centro', 'Metropolitana', 'Zona Sur'].flatMap(name => ['93', '95', '97'].map(grade => ({
-    zona_geografica_nombre: name, combustible_nombre_corto: grade === '95' ? 'A95' : grade,
-    combustible_nombre_largo: `Gasolina ${grade}`, unidad_cobro_nombre_corto: '$/L',
-    precio_promedio: String(1000 + Number(grade)), precio_min: '1000', precio_max: '1200'
-  })));
-  const data = extractPrices(rows, '2026-11-13T00:00:00.000Z');
-  assert.equal(data.zones[2].prices['95'].average, 1095);
-  assert.equal(data.zones[2].prices['97'].average, 1097);
+test('rechaza una respuesta corta en vez de publicar un precio erróneo', () => {
+  assert.throws(() => construirPrecios(fixture), /al menos 500/);
+  assert.throws(() => construirPrecios({ data: [] }, undefined, { minEstaciones: 1 }), /Solo 0 estaciones/);
+});
+
+test('rechaza si falta un combustible en una zona', () => {
+  const soloRm = { data: fixture.data.filter(s => s.region.includes('Metropolitana')) };
+  assert.throws(() => construirPrecios(soloRm, undefined, { minEstaciones: 1 }), /Falta .* en Norte/);
 });

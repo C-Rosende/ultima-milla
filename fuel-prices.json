@@ -1,88 +1,82 @@
 {
-  "source": "https://api.bencinaenlinea.cl/api/estaciones/precios_combustibles/export_zonal",
-  "product": "Gasolinas 93, 95 y 97",
+  "source": "https://api.bencinaenlinea.cl/api/busqueda_estacion_filtro",
+  "product": "Gasolinas 93, 95 y 97 y diésel",
   "unit": "CLP/L",
-  "fetchedAt": "2026-11-13T13:18:28.252Z",
-  "zones": [
-    {
-      "name": "Zona Norte",
-      "prices": {
-        "93": {
-          "average": 1680.47,
-          "min": 1522,
-          "max": 1722
-        },
-        "95": {
-          "average": 1712.3,
-          "min": 1554,
-          "max": 1754
-        },
-        "97": {
-          "average": 1744.363,
-          "min": 1578,
-          "max": 1770
-        }
+  "method": "mediana por zona",
+  "fetchedAt": "2026-11-20T03:12:56.428Z",
+  "estaciones": 1750,
+  "zonas": {
+    "Norte": {
+      "93": {
+        "mediana": 1651,
+        "n": 211
+      },
+      "95": {
+        "mediana": 1686,
+        "n": 209
+      },
+      "97": {
+        "mediana": 1716,
+        "n": 202
+      },
+      "diesel": {
+        "mediana": 1552,
+        "n": 222
       }
     },
-    {
-      "name": "Zona Centro",
-      "prices": {
-        "93": {
-          "average": 1611.652,
-          "min": 1192,
-          "max": 1907
-        },
-        "95": {
-          "average": 1646.03,
-          "min": 1221,
-          "max": 1710
-        },
-        "97": {
-          "average": 1686.719,
-          "min": 1466,
-          "max": 1737
-        }
+    "Centro": {
+      "93": {
+        "mediana": 1584,
+        "n": 686
+      },
+      "95": {
+        "mediana": 1622,
+        "n": 681
+      },
+      "97": {
+        "mediana": 1662,
+        "n": 554
+      },
+      "diesel": {
+        "mediana": 1486,
+        "n": 695
       }
     },
-    {
-      "name": "Metropolitana",
-      "prices": {
-        "93": {
-          "average": 1575.705,
-          "min": 1387,
-          "max": 1644
-        },
-        "95": {
-          "average": 1621.085,
-          "min": 1434,
-          "max": 1697
-        },
-        "97": {
-          "average": 1672.799,
-          "min": 1277,
-          "max": 1750
-        }
+    "Metropolitana": {
+      "93": {
+        "mediana": 1539,
+        "n": 483
+      },
+      "95": {
+        "mediana": 1588,
+        "n": 486
+      },
+      "97": {
+        "mediana": 1644,
+        "n": 448
+      },
+      "diesel": {
+        "mediana": 1463,
+        "n": 487
       }
     },
-    {
-      "name": "Zona Sur",
-      "prices": {
-        "93": {
-          "average": 1657.653,
-          "min": 1188,
-          "max": 1902
-        },
-        "95": {
-          "average": 1686.492,
-          "min": 1210,
-          "max": 1917
-        },
-        "97": {
-          "average": 1716.9,
-          "min": 1230,
-          "max": 1924
-        }
+    "Sur": {
+      "93": {
+        "mediana": 1628,
+        "n": 335
+      },
+      "95": {
+        "mediana": 1657,
+        "n": 332
+      },
+      "97": {
+        "mediana": 1686,
+        "n": 305
+      },
+      "diesel": {
+        "mediana": 1530,
+        "n": 342
       }
     }
-  ]
+  }
 }

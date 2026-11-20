@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "descripcion": "Único lugar de constantes ajustables de Última Milla. Cambiar un número aquí lo cambia en toda la app.",
+
+  "factorConsumo": {
+    "urbano-homologado": 1,
+    "fabricante": 0.85,
+    "estimado": 0.85,
+    "declarado": 0.7,
+    "propio": 1
+  },
+  "factorConsumoNota": {
+    "urbano-homologado": "Autos: ciclo urbano homologado del Ministerio de Energía, ya es consumo de ciudad.",
+    "fabricante": "Motos: la ficha comercial es optimista. 0,85 deja la CB125F (45 km/L) en 38,25 km/L, cerca de los 38 km/L de la investigación del equipo.",
+    "estimado": "Motos sin ficha propia: se tratan como la ficha comercial.",
+    "declarado": "Scooters y bicis eléctricas: autonomía declarada en condiciones ideales; la real ronda 70 %.",
+    "propio": "Dato que escribe la persona a partir de su propio vehículo: se usa tal cual."
+  },
+
+  "mantencionKm": {
+    "auto": 23.6,
+    "moto": 20.7,
+    "scooter": 17,
+    "bici-electrica": 23.8,
+    "bici": 13.8
+  },
+  "mantencionNota": {
+    "auto": "Dato del equipo (auto chico). No se volvió a verificar.",
+    "moto": "Dato del equipo (moto 125 a 150 cc). No se volvió a verificar.",
+    "scooter": "Estimado: neumáticos 3,5 + frenos 3,0 + batería 10,5 $/km. Solo el precio del neumático tiene fuente.",
+    "bici-electrica": "Estimado: neumáticos 4,8 + transmisión 6,3 + frenos 2,7 + batería 10,0 $/km. Vidas útiles y precio de batería son supuestos.",
+    "bici": "Estimado a partir de la mantención de una bici eléctrica, sin lo que solo existe en ellas."
+  },
+
+  "mantencionDerivacion": {
+    "bici": "13,8 = 23,8 (bici eléctrica) menos 10,0 (componente batería). Estimado."
+  },
+
+  "combustiblePorDefecto": { "auto": "93", "moto": "93" },
+  "combustiblesPermitidos": { "auto": ["93", "95", "97", "diesel"], "moto": ["93", "95", "97"] },
+
+  "electricidad": {
+    "porZona": {
+      "Metropolitana": { "precio": 240, "estimado": true, "nota": "Enel Santiago BT1: 237,8 $/kWh con IVA desde 2026-11-01. Se redondea a 240." },
+      "Norte": { "precio": 240, "estimado": true, "referencia": "RM", "nota": "Sin dato de la distribuidora. Referencia de la Región Metropolitana." },
+      "Centro": { "precio": 240, "estimado": true, "referencia": "RM", "nota": "Sin dato de la distribuidora. Referencia de la Región Metropolitana. En el litoral central la tarifa ronda 315 $/kWh." },
+      "Sur": { "precio": 240, "estimado": true, "referencia": "RM", "nota": "Sin dato de la distribuidora. Referencia de la Región Metropolitana." }
+    },
+    "eficienciaCarga": 0.9
+  },
+
+  "respaldoCombustible": {
+    "fecha": "2026-11-19",
+    "origen": "Mediana por zona de las estaciones de Bencina en Línea, 2026-11-19",
+    "zonas": {
+      "Norte": { "93": 1651, "95": 1686, "97": 1716, "diesel": 1552 },
+      "Centro": { "93": 1584, "95": 1622, "97": 1662, "diesel": 1486 },
+      "Metropolitana": { "93": 1539, "95": 1588, "97": 1644, "diesel": 1463 },
+      "Sur": { "93": 1628, "95": 1657, "97": 1686, "diesel": 1530 }
+    }
+  },
+  "zonaPorDefecto": "Metropolitana",
+
+  "estaciones": {
+    "url": "https://api.bencinaenlinea.cl/api/busqueda_estacion_filtro",
+    "ttlCacheMin": 30,
+    "minimoValidas": 100,
+    "tiempoEsperaMs": 15000,
+    "distanciaMaxKm": 30,
+    "toleranciaAtipico": 0.25,
+    "claveCache": "ultima-milla-estaciones-v1",
+    "marcas": { "5": "Copec", "4": "Shell", "151": "Aramco", "131": "Gulf", "10": "Sin bandera" }
+  },
+
+  "ofertaManual": {
+    "vueltaPorKm": 0.5,
+    "minutosBase": 8,
+    "minutosPorKm": 6.25,
+    "minutosMinimos": 5,
+    "esperaMin": 12
+  },
+
+  "ejemplos": [
+    { "id": "bueno", "label": "Pedido bueno", "gross": 4100, "km": 3.2, "platform": "Uber Eats" },
+    { "id": "justo", "label": "Pedido justo", "gross": 3500, "km": 3.2, "platform": "PedidosYa" },
+    { "id": "malo", "label": "Pedido malo", "gross": 2500, "km": 4.5, "platform": "Rappi" },
+    { "id": "trampa", "label": "La trampa", "gross": 5200, "km": 8.9, "waitMin": 18, "platform": "Uber Eats", "hint": "Paga más, rinde menos" }
+  ],
+
+  "gastosMensuales": { "datosMoviles": 12000, "horasTrabajo": 200 },
+  "umbralJusto": 0.9,
+  "luis": { "metaPorHora": 5000, "vehiculoId": "honda-cb125f-twister" },
+  "esperaReferenciaSeg": 300,
+
+  "gps": {
+    "precisionMinM": 50,
+    "velocidadMaxKmH": 120,
+    "pasoMinimoM": 8,
+    "tiempoEsperaMs": 12000,
+    "precisionZonaMaxM": 5000,
+    "kmSimuladoFactor": 1.06
+  },
+
+  "limites": {
+    "pagoMin": 100,
+    "pagoMax": 1000000,
+    "kmMin": 0.1,
+    "kmMax": 200,
+    "consumoMax": 500,
+    "mantencionMax": 1000
+  }
+}
