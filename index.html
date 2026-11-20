@@ -3,22 +3,35 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#10251e">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#F2F4F3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0A0F1A" media="(prefers-color-scheme: dark)">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Última Milla">
-  <meta name="description" content="Última Milla: descubre cuánto te deja realmente cada entrega. Prototipo interactivo para repartidores.">
+  <meta name="description" content="Última Milla: descubre cuánto te deja realmente cada entrega. Demo interactiva para repartidores, con el perfil de Luis.">
   <title>Última Milla · Tu ganancia real</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
   <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Atkinson+Hyperlegible+Next:ital,wght@0,400..800;1,400..800&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="desktop-note"><span class="brand-ic" aria-hidden="true">↗</span><span><b>Última Milla</b><small>Tu ganancia real · prototipo interactivo</small></span></div>
+  <aside class="desktop-note" aria-label="Sobre esta demo">
+    <svg class="mark" viewBox="0 0 44 24" aria-hidden="true"><path class="mk-line" d="M9 12h26"/><circle class="mk-a" cx="9" cy="12" r="5.5"/><circle class="mk-b" cx="35" cy="12" r="5.5"/></svg>
+    <h2>Última Milla</h2>
+    <p>Demo del perfil de Luis, repartidor en moto Honda CB125F con meta de $5.000 por hora.</p>
+    <p>Escribe el pago y los km de un pedido, o toca un ejemplo. La app descuenta bencina, mantención, datos y espera, y te dice si conviene.</p>
+    <p class="desk-url">Abre esta demo en tu celular: <code id="demo-url"></code></p>
+  </aside>
   <div class="phone" id="phone">
     <div id="app"></div>
   </div>
+  <script>document.getElementById('demo-url').textContent = location.origin + location.pathname.replace(/index\.html$/, '');</script>
   <script src="calc.js"></script>
   <script src="route-map.js"></script>
   <script src="app.js"></script>
