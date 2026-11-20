@@ -851,3 +851,11 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
     scroll-behavior: auto !important;
   }
 }
+
+.manual-trust { display: flex; align-items: flex-start; gap: 7px; margin: 10px 2px 0; font-size: 12px; line-height: 1.4; color: var(--muted); }
+.manual-trust .ic { width: 14px; height: 14px; margin-top: 1px; color: var(--green); }
+.cost-km .kicker { margin-bottom: 2px; }
+.cost-km .row .amt.total { color: var(--green); }
+.cost-km-source { margin-top: 10px; font-size: 12px; }
+.cost-km .row .amt { white-space: nowrap; }
+.cost-km .row .amt small { display: inline; margin-left: 2px; }

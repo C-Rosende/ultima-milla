@@ -5,46 +5,45 @@
   const KEY = 'ultima-milla-luis-demo-v2';
   const DEMO = new URLSearchParams(location.search).get('demo') === '1';
   const DIRECT = new URLSearchParams(location.search).get('pantalla');
-  const LUIS = globalThis.DATOS?.luis?.cifras || { espera_min:110, pedidos:19 };
   if (new URLSearchParams(location.search).get('embebido') === '1') document.body.classList.add('embedded');
   if (DIRECT === 'resumen' && new URLSearchParams(location.search).get('compacto') === '1') document.body.classList.add('compact-summary');
   const SCREENS = ['inicio', 'oferta', 'resultado', 'resumen', 'mapa', 'vehiculo', 'carga'];
   const MONEY = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 });
   const VEHICLES = [
-    { id:'cb190', group:'Moto', name:'Honda CB190R', type:'fuel', consumption:35, maintenance:57, investment:2850000, icon:'🏍', unit:'km/l' },
-    { id:'fz', group:'Moto', name:'Yamaha FZ', type:'fuel', consumption:38, maintenance:52, investment:2600000, icon:'🏍', unit:'km/l' },
-    { id:'gixxer', group:'Moto', name:'Suzuki Gixxer', type:'fuel', consumption:37, maintenance:54, investment:2750000, icon:'🏍', unit:'km/l' },
-    { id:'sail', group:'Auto', name:'Chevrolet Sail', type:'fuel', consumption:13, maintenance:98, investment:8300000, icon:'🚗', unit:'km/l' },
-    { id:'swift', group:'Auto', name:'Suzuki Swift', type:'fuel', consumption:17, maintenance:92, investment:10400000, icon:'🚗', unit:'km/l' },
+    { id:'cb190', group:'Moto', name:'Honda CB190R', type:'fuel', consumption:35, maintenance:25, investment:2850000, icon:'🏍', unit:'km/l' },
+    { id:'fz', group:'Moto', name:'Yamaha FZ', type:'fuel', consumption:37, maintenance:21, investment:2600000, icon:'🏍', unit:'km/l' },
+    { id:'gixxer', group:'Moto', name:'Suzuki Gixxer', type:'fuel', consumption:37, maintenance:22, investment:2750000, icon:'🏍', unit:'km/l' },
+    { id:'sail', group:'Auto', name:'Chevrolet Sail', type:'fuel', consumption:13, maintenance:24, investment:8300000, icon:'🚗', unit:'km/l' },
+    { id:'swift', group:'Auto', name:'Suzuki Swift', type:'fuel', consumption:14, maintenance:23, investment:10400000, icon:'🚗', unit:'km/l' },
     { id:'urban', group:'Bicicleta', name:'Bicicleta urbana', type:'human', consumption:1, maintenance:22, investment:280000, icon:'🚲', unit:'sin combustible' },
     { id:'ebike', group:'Bici eléctrica', name:'Oxford E-Bike', type:'electric', consumption:75, maintenance:32, investment:1250000, icon:'⚡', unit:'km/kWh' },
     { id:'emoto', group:'Moto eléctrica', name:'Moto eléctrica urbana', type:'electric', consumption:38, maintenance:38, investment:2400000, icon:'⚡', unit:'km/kWh' },
     { id:'scooter', group:'Scooter', name:'Xiaomi Electric Scooter', type:'electric', consumption:40, maintenance:28, investment:580000, icon:'🛴', unit:'km/kWh' },
-    { id:'ybr125', group:'Moto', name:'Yamaha YBR 125', type:'fuel', consumption:42, maintenance:48, investment:1900000, unit:'km/l' },
-    { id:'pulsar200', group:'Moto', name:'Bajaj Pulsar NS 200', type:'fuel', consumption:33, maintenance:60, investment:2900000, unit:'km/l' },
-    { id:'gn125', group:'Moto', name:'Suzuki GN 125', type:'fuel', consumption:40, maintenance:47, investment:2100000, unit:'km/l' },
-    { id:'cb125f', group:'Moto', name:'Honda CB125F', type:'fuel', consumption:45, maintenance:46, investment:2200000, unit:'km/l' },
+    { id:'ybr125', group:'Moto', name:'Yamaha YBR 125', type:'fuel', consumption:41, maintenance:21, investment:1900000, unit:'km/l' },
+    { id:'pulsar200', group:'Moto', name:'Bajaj Pulsar NS 200', type:'fuel', consumption:35, maintenance:25, investment:2900000, unit:'km/l' },
+    { id:'gn125', group:'Moto', name:'Suzuki GN 125', type:'fuel', consumption:40, maintenance:21, investment:2100000, unit:'km/l' },
+    { id:'cb125f', group:'Moto', name:'Honda CB125F', type:'fuel', consumption:38, maintenance:21, investment:2200000, unit:'km/l' },
     { id:'morbidelli', group:'Moto', name:'Super Soco TC Max', type:'electric', consumption:42, maintenance:36, investment:4200000, unit:'km/kWh' },
-    { id:'spark', group:'Auto', name:'Chevrolet Spark', type:'fuel', consumption:16, maintenance:87, investment:7900000, unit:'km/l' },
-    { id:'morning', group:'Auto', name:'Kia Morning', type:'fuel', consumption:16, maintenance:90, investment:9400000, unit:'km/l' },
-    { id:'i10', group:'Auto', name:'Hyundai Grand i10', type:'fuel', consumption:15, maintenance:90, investment:10500000, unit:'km/l' },
-    { id:'alto', group:'Auto', name:'Suzuki Alto', type:'fuel', consumption:18, maintenance:85, investment:7900000, unit:'km/l' },
+    { id:'spark', group:'Auto', name:'Chevrolet Spark', type:'fuel', consumption:15, maintenance:22, investment:7900000, unit:'km/l' },
+    { id:'morning', group:'Auto', name:'Kia Morning', type:'fuel', consumption:14, maintenance:23, investment:9400000, unit:'km/l' },
+    { id:'i10', group:'Auto', name:'Hyundai Grand i10', type:'fuel', consumption:14, maintenance:23, investment:10500000, unit:'km/l' },
+    { id:'alto', group:'Auto', name:'Suzuki Alto', type:'fuel', consumption:15, maintenance:22, investment:7900000, unit:'km/l' },
     { id:'leaf', group:'Auto', name:'Nissan Leaf', type:'electric', consumption:6, maintenance:60, investment:22000000, unit:'km/kWh' },
     { id:'oxford', group:'Bicicleta', name:'Oxford Urbana', type:'human', consumption:1, maintenance:22, investment:330000, unit:'sin combustible' },
     { id:'trek', group:'Bicicleta', name:'Trek FX', type:'human', consumption:1, maintenance:25, investment:850000, unit:'sin combustible' },
     { id:'specialized', group:'Bicicleta', name:'Specialized Turbo Vado', type:'electric', consumption:80, maintenance:34, investment:3900000, unit:'km/kWh' },
     { id:'ninebot', group:'Scooter', name:'Segway Ninebot F2', type:'electric', consumption:38, maintenance:28, investment:690000, unit:'km/kWh' },
     { id:'navee', group:'Scooter', name:'Navee V50', type:'electric', consumption:42, maintenance:29, investment:620000, unit:'km/kWh' },
-    { id:'navi', group:'Moto', name:'Honda Navi 110', type:'fuel', consumption:40, maintenance:48, investment:1850000, unit:'km/l' },
-    { id:'xr150', group:'Moto', name:'Honda XR150L', type:'fuel', consumption:36, maintenance:55, investment:2700000, unit:'km/l' },
-    { id:'boxer', group:'Moto', name:'Bajaj Boxer CT 100', type:'fuel', consumption:47, maintenance:45, investment:1650000, unit:'km/l' },
-    { id:'apache', group:'Moto', name:'TVS Apache RTR 160', type:'fuel', consumption:38, maintenance:52, investment:2350000, unit:'km/l' },
-    { id:'yaris', group:'Auto', name:'Toyota Yaris', type:'fuel', consumption:16, maintenance:90, investment:12500000, unit:'km/l' },
-    { id:'soluto', group:'Auto', name:'Kia Soluto', type:'fuel', consumption:15, maintenance:90, investment:10500000, unit:'km/l' },
-    { id:'accent', group:'Auto', name:'Hyundai Accent', type:'fuel', consumption:15, maintenance:92, investment:11900000, unit:'km/l' },
-    { id:'baleno', group:'Auto', name:'Suzuki Baleno', type:'fuel', consumption:17, maintenance:89, investment:11200000, unit:'km/l' },
-    { id:'onix', group:'Auto', name:'Chevrolet Onix', type:'fuel', consumption:16, maintenance:91, investment:11300000, unit:'km/l' },
-    { id:'celerio', group:'Auto', name:'Suzuki Celerio', type:'fuel', consumption:18, maintenance:86, investment:8900000, unit:'km/l' },
+    { id:'navi', group:'Moto', name:'Honda Navi 110', type:'fuel', consumption:42, maintenance:20, investment:1850000, unit:'km/l' },
+    { id:'xr150', group:'Moto', name:'Honda XR150L', type:'fuel', consumption:36, maintenance:22, investment:2700000, unit:'km/l' },
+    { id:'boxer', group:'Moto', name:'Bajaj Boxer CT 100', type:'fuel', consumption:42, maintenance:20, investment:1650000, unit:'km/l' },
+    { id:'apache', group:'Moto', name:'TVS Apache RTR 160', type:'fuel', consumption:37, maintenance:23, investment:2350000, unit:'km/l' },
+    { id:'yaris', group:'Auto', name:'Toyota Yaris', type:'fuel', consumption:13, maintenance:25, investment:12500000, unit:'km/l' },
+    { id:'soluto', group:'Auto', name:'Kia Soluto', type:'fuel', consumption:13, maintenance:24, investment:10500000, unit:'km/l' },
+    { id:'accent', group:'Auto', name:'Hyundai Accent', type:'fuel', consumption:13, maintenance:27, investment:11900000, unit:'km/l' },
+    { id:'baleno', group:'Auto', name:'Suzuki Baleno', type:'fuel', consumption:14, maintenance:24, investment:11200000, unit:'km/l' },
+    { id:'onix', group:'Auto', name:'Chevrolet Onix', type:'fuel', consumption:13, maintenance:24, investment:11300000, unit:'km/l' },
+    { id:'celerio', group:'Auto', name:'Suzuki Celerio', type:'fuel', consumption:15, maintenance:22, investment:8900000, unit:'km/l' },
     { id:'orion', group:'Bicicleta', name:'Oxford Orion', type:'human', consumption:1, maintenance:24, investment:350000, unit:'sin combustible' },
     { id:'marlin', group:'Bicicleta', name:'Trek Marlin 5', type:'human', consumption:1, maintenance:26, investment:760000, unit:'sin combustible' },
     { id:'escape', group:'Bicicleta', name:'Giant Escape 3', type:'human', consumption:1, maintenance:24, investment:650000, unit:'sin combustible' },
@@ -73,44 +72,53 @@
   const dayAgo = n => { const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()-n); return d.toLocaleDateString('sv-SE'); };
   function seedHistory() {
     const jobs = [];
+    const slots = ['09:40','10:28','11:17','12:09','13:05','14:18','15:31','16:42','17:35'];
+    const places = [
+      ['Cocina de barrio','Providencia','Ñuñoa'],
+      ['La Huerta','Ñuñoa','Providencia'],
+      ['Sándwich Club','Providencia','Las Condes'],
+      ['Deli Central','Santiago Centro','Providencia'],
+      ['El Rincón','Macul','Ñuñoa'],
+      ['Café de la Plaza','Las Condes','Providencia']
+    ];
+    const now = new Date();
+    const currentMinutes = now.getHours()*60+now.getMinutes();
+    const settings = defaults().settings;
     for (let day=29; day>=0; day--) {
-      if (day === 9 || day === 4) continue;
-      if (day === 0) {
-        for (let i=0; i<19; i++) {
-          const gross=i===18?4400:3200, fuel=i===18?560:480, totalMinutes=i===18?48:34;
-          const waitMin=Math.floor((i+1)*LUIS.espera_min/LUIS.pedidos)-Math.floor(i*LUIS.espera_min/LUIS.pedidos);
-          jobs.push({id:`luis-${i}`,date:today(),time:`${String(9+Math.floor(i/2)).padStart(2,'0')}:${i%2?'30':'00'}`,platform:['Uber Eats','PedidosYa','Rappi'][i%3],restaurant:'Pedido entregado',from:'Santiago',to:'Entrega',status:'completed',gross,fuel,maintenance:0,data:0,cost:fuel,net:gross-fuel,totalMinutes,minutes:totalMinutes-waitMin,waitMin,km:3.2,returnKm:.8,totalKm:4,signal:'green'});
-        }
-        continue;
-      }
-      const count = 5 + (day*7)%4;
+      const date = dayAgo(day);
+      const weekday = new Date(`${date}T12:00:00`).getDay();
+      if (weekday === 0) continue;
+      const count = weekday === 6 ? 5 : 7 + day%3;
       for (let i=0; i<count; i++) {
+        const time = slots[i];
+        if (day === 0 && Number(time.slice(0,2))*60+Number(time.slice(3)) > currentMinutes-15) break;
         const platform = ['Uber Eats','PedidosYa','Rappi'][(i+day)%3];
-        const gross = 3300 + ((i*5+day*3)%8)*570;
+        const gross = 3200 + ((i*5+day*3)%8)*450;
         const km = 2.4 + ((i*3+day)%7)*0.7;
         const returnKm = 0.6 + ((i+day)%4)*0.55;
         const minutes = 22 + ((i*7+day)%5)*7;
         const waitMin = 3 + ((i*4+day)%5)*3;
-        const calc = calculateOffer({gross,km,returnKm,minutes,waitMin}, VEHICLES[0], defaults().settings);
-        jobs.push({ id:`seed-${day}-${i}`, date:dayAgo(day), time:`${10+Math.floor(i*1.3)}:${String((i*17)%60).padStart(2,'0')}`, platform, restaurant:['Local Centro','Cocina Norte','La Huerta','Sándwich Club'][i%4], from:'Santiago', to:'Entrega', status:'completed', ...calc });
+        const calc = calculateOffer({gross,km,returnKm,minutes,waitMin}, VEHICLES.find(v=>v.id==='cb125f'), settings);
+        const [restaurant,from,to] = places[(i+day)%places.length];
+        jobs.push({ id:`seed-${date}-${i}`, date, time, platform, restaurant, from, to, status:'completed', waitSource:'estimada', ...calc });
       }
-      if (day%3===0) jobs.push({id:`reject-${day}`,date:dayAgo(day),time:'18:42',platform:'Rappi',restaurant:'Oferta descartada',status:'rejected',gross:0,net:0,totalKm:0,returnKm:0,waitMin:0,totalMinutes:0,signal:'red',fuel:0,maintenance:0,data:0});
+      if (day>0 && weekday!==6 && day%4===0) jobs.push({id:`seed-reject-${date}`,date,time:'18:42',platform:'Rappi',restaurant:'Oferta descartada',status:'rejected',gross:0,net:0,totalKm:0,returnKm:0,waitMin:0,totalMinutes:0,signal:'red',fuel:0,maintenance:0,data:0});
     }
     return jobs;
   }
-  function defaults() { return { onboarded:true, profile:{name:'Luis',email:'luis@demo.example'}, connected:['Uber Eats','PedidosYa','Rappi'], vehicleId:'cb190', customVehicle:null, settings:{fuelGrade:'93',priceZone:'Metropolitana',fuelPrice:1300,fuelPriceManual:false,kwhPrice:220,batteryKwh:0,chargeKw:2,chargeStart:20,chargeEnd:80,navApp:'waze',dataMonthly:12000,hoursMonthly:200,goal:5000,investment:2850000}, jobs:[], refuels:[], shiftActive:false, nextOfferAt:0, speed:0, offerCursor:0, pendingOffer:null, activeDelivery:null, lastOutcomeId:null }; }
+  const isSeedJob = job => /^(?:seed-|luis-\d+$|reject-\d+$)/.test(String(job?.id||''));
+  function freshDemo() { return { ...defaults(), jobs:seedHistory(), seedDate:today() }; }
+  function defaults() { return { onboarded:true, profile:{name:'Luis',email:'luis@demo.example'}, connected:['Uber Eats','PedidosYa','Rappi'], vehicleId:'cb125f', customVehicle:null, settings:{fuelGrade:'93',priceZone:'Metropolitana',fuelPrice:1576,fuelPriceManual:false,kwhPrice:220,batteryKwh:0,chargeKw:2,chargeStart:20,chargeEnd:80,navApp:'waze',dataMonthly:12000,hoursMonthly:200,goal:5000,investment:2200000}, jobs:[], refuels:[], shiftActive:false, nextOfferAt:0, speed:0, offerCursor:0, pendingOffer:null, activeDelivery:null, lastOutcomeId:null }; }
   function load() {
-    if (DEMO || DIRECT) return { ...defaults(), jobs:seedHistory() };
+    if (DEMO || DIRECT) return freshDemo();
     try {
       const raw = JSON.parse(localStorage.getItem(KEY));
       if (raw && Array.isArray(raw.jobs) && raw.settings) {
-        if (raw.jobs.some(j=>j.id?.startsWith('seed-13-')) && !raw.jobs.some(j=>j.id?.startsWith('seed-14-'))) {
-          raw.jobs = [...seedHistory().filter(j=>j.date<dayAgo(13)), ...raw.jobs];
-        }
-        return { ...defaults(), ...raw, profile:defaults().profile, connected:raw.onboarded&&Array.isArray(raw.connected)?raw.connected:defaults().connected, refuels:Array.isArray(raw.refuels)?raw.refuels:[], settings:{...defaults().settings,...raw.settings}, onboarded:true, speed:0 };
+        if (raw.seedDate !== today()) raw.jobs = [...seedHistory(), ...raw.jobs.filter(j=>!isSeedJob(j))];
+        return { ...defaults(), ...raw, seedDate:today(), profile:defaults().profile, connected:raw.onboarded&&Array.isArray(raw.connected)?raw.connected:defaults().connected, refuels:Array.isArray(raw.refuels)?raw.refuels:[], settings:{...defaults().settings,...raw.settings}, onboarded:true, speed:0 };
       }
     } catch (_) { /* El prototipo sigue funcionando si el almacenamiento está deshabilitado. */ }
-    return defaults();
+    return freshDemo();
   }
   let state = load();
   // El QR siempre aterriza en Inicio; una vista específica solo se abre mediante enlace explícito.
@@ -122,7 +130,7 @@
     restaurant:currentOffer.restaurant==='Restaurante no indicado'?'':currentOffer.restaurant,
     minutes:currentOffer.minutesEstimated?'':currentOffer.minutes,
     waitMin:currentOffer.waitSource==='manual'?currentOffer.waitMin:'',
-    returnKm:currentOffer.returnKm||''
+    returnKm:currentOffer.returnEstimated?'':currentOffer.returnKm||''
   } : null;
   let waitStart = state.activeDelivery?.startedAt || 0;
   let acceptedOffer = state.activeDelivery?.offer || null;
@@ -241,11 +249,11 @@
       const offer=currentOffer||acceptedOffer;
       const calc=acceptedOffer?acceptedCalc:calculateOffer(offer,vehicle(),state.settings);
       const decision=calc.signal==='green'?'Aceptar':calc.signal==='yellow'?'Revisar antes de aceptar':'Rechazar';
-      content=content.replace('<div class="verdict ',`${offerWaitCard(offer)}<dl class="offer-glance" aria-label="Rentabilidad estimada de un vistazo"><div><dt>Neto por hora</dt><dd>${money(calc.hourly)}<small>/h</small></dd></div><div><dt>Neto por km</dt><dd>${money(calc.netPerKm)}<small>/km</small></dd></div></dl><p class="offer-glance-note">Por km incluye el regreso indicado. Valores estimados, no ingresos garantizados.</p><div class="verdict `);
+      content=content.replace('<div class="verdict ',`${offerWaitCard(offer)}<dl class="offer-glance" aria-label="Rentabilidad estimada de un vistazo"><div><dt>Neto por hora</dt><dd>${money(calc.hourly)}<small>/h</small></dd></div><div><dt>Neto por km</dt><dd>${money(calc.netPerKm)}<small>/km</small></dd></div></dl><p class="offer-glance-note">Por km incluye el regreso. Valores estimados, no ingresos garantizados.</p><div class="verdict `);
       if(!acceptedOffer) content=content.replace(`<div class="v-title">${signalText(calc.signal)}</div>`,`<div class="v-title">Recomendación: ${decision}</div>`);
       if(offer.manual) {
         content=content.replace('Nueva oferta · ', 'Tus datos · ');
-        content=content.replace('Calculado con tus costos y el regreso sin pedido.', offer.returnKm>0?'Calculado con tus costos y el regreso que indicaste.':'Calculado con tus costos. No incluye regreso sin pedido.');
+        content=content.replace('Calculado con tus costos y el regreso sin pedido.', offer.returnEstimated?'Calculado con tus costos y un regreso estimado de la mitad del recorrido.':offer.returnKm>0?'Calculado con tus costos y el regreso que indicaste.':'Calculado con tus costos. No incluye regreso sin pedido.');
         content=content.replace('Estimación de demostración; no recibe ofertas reales.', 'Estimación orientativa con datos ingresados por ti; no recibe ofertas reales.');
         content=content.replace('<div class="card"><div class="net-line">', `<div class="manual-context"><span>02 / 02 · ANÁLISIS</span><p>${offer.minutesEstimated?'Tiempo de viaje estimado según distancia. ':'Tiempo de viaje ingresado por ti. '}${offer.waitSource==='manual'?'Espera ingresada por ti. ':'Espera orientativa o de tu historial. '}No usa tráfico en vivo.</p>${!acceptedOffer?'<button class="btn link" data-action="edit-manual">Editar datos</button>':''}</div><div class="card"><div class="net-line">`);
       }
@@ -311,7 +319,7 @@
     return `<section class="card journey" aria-label="Estado del pedido"><p class="kicker">PEDIDO EN CURSO · DEMO</p><ol class="journey-steps">${steps.map(([stage,name],i)=>`<li class="${i<active?'done':i===active?'active':''}"><span aria-hidden="true">${i<active?'✓':i+1}</span><b>${name}</b></li>`).join('')}</ol><p class="journey-detail">${detail}</p>${deliveryStage==='arrived'?`<p class="journey-timer">Espera medida <strong id="wait-timer">00:00</strong></p>`:deliveryStage==='picked'?`<p class="note">Espera en el local: ${measuredWaitMin} min medidos.</p>`:''}<button class="btn accept big block" data-action="${action}">${label}</button><button class="btn outline block" data-screen="mapa">Ver mapa de prueba</button><p class="note">El mapa muestra un retiro ilustrativo, no el destino de este pedido.</p></section>`;
   }
   function offerPage() {
-    if (!currentOffer && !acceptedOffer) return `<div class="decision-intro"><p class="kicker">LA DECISIÓN ANTES DEL PEDIDO</p><h1 class="title" id="page-title" tabindex="-1">¿Cuánto me queda?</h1><p class="lead">Pon el pago y la distancia de la oferta. Te mostramos el neto estimado antes de aceptar.</p></div><section class="card manual-card"><div class="manual-card-head"><span class="manual-mark">01 / 02</span><h2>Evalúa tu pedido</h2><p>Solo necesitas 2 datos para empezar.</p></div><form id="manual-offer-form" class="manual-form"><div class="manual-primary"><label for="manual-gross">Pago ofrecido <span>CLP</span></label><input id="manual-gross" name="gross" type="number" inputmode="numeric" min="100" max="1000000" step="1" placeholder="Ej.: 4100" value="${manualDraft?.gross??''}" required><label for="manual-km">Distancia del pedido <span>km</span></label><input id="manual-km" name="km" type="number" inputmode="decimal" min="0.1" max="200" step="0.1" placeholder="Ej.: 3,2" value="${manualDraft?.km??''}" required></div><details class="manual-more"><summary>Ajustar tiempo y contexto <span>Opcional</span></summary><div class="manual-extra"><label for="manual-platform">Plataforma</label><select id="manual-platform" name="platform">${['Uber Eats','PedidosYa','Rappi','Otra'].map(p=>`<option ${manualDraft?.platform===p?'selected':''}>${p}</option>`).join('')}</select><label for="manual-restaurant">Restaurante</label><input id="manual-restaurant" name="restaurant" maxlength="60" autocomplete="off" placeholder="Si lo conoces" value="${escapeHtml(manualDraft?.restaurant||'')}"><label for="manual-minutes">Tiempo de viaje <span>min · si no lo sabes, lo estimamos</span></label><input id="manual-minutes" name="minutes" type="number" inputmode="numeric" min="1" max="360" step="1" placeholder="Estimado según distancia" value="${manualDraft?.minutes??''}"><label for="manual-wait">Espera en el local <span>min</span></label><input id="manual-wait" name="waitMin" type="number" inputmode="numeric" min="0" max="180" step="1" placeholder="8 min si no la sabes" value="${manualDraft?.waitMin??''}"><label for="manual-return">Regreso sin pedido <span>km</span></label><input id="manual-return" name="returnKm" type="number" inputmode="decimal" min="0" max="200" step="0.1" placeholder="0 km si no lo sabes" value="${manualDraft?.returnKm??''}"></div></details><button class="btn primary big block manual-submit" type="submit">Calcular cuánto me queda ${icon('arrow','sm')}</button></form></section><div class="demo-separator"><span>O prueba el recorrido completo</span></div><button class="btn outline block" data-action="simulate">Recibir una oferta de ejemplo</button><p class="note center">Estimación, no ingreso garantizado. La app no lee pedidos reales.</p>`;
+    if (!currentOffer && !acceptedOffer) return `<div class="decision-intro"><p class="kicker">LA DECISIÓN ANTES DEL PEDIDO</p><h1 class="title" id="page-title" tabindex="-1">¿Cuánto me queda?</h1><p class="lead">Pon el pago y la distancia de la oferta. Te mostramos el neto estimado antes de aceptar.</p></div><section class="card manual-card"><div class="manual-card-head"><span class="manual-mark">01 / 02</span><h2>Evalúa tu pedido</h2><p>Solo necesitas 2 datos para empezar.</p></div><form id="manual-offer-form" class="manual-form"><div class="manual-primary"><label for="manual-gross">Pago ofrecido <span>CLP</span></label><input id="manual-gross" name="gross" type="number" inputmode="numeric" min="100" max="1000000" step="1" placeholder="Ej.: 4100" value="${manualDraft?.gross??''}" required><label for="manual-km">Distancia del pedido <span>km</span></label><input id="manual-km" name="km" type="number" inputmode="decimal" min="0.1" max="200" step="0.1" placeholder="Ej.: 3,2" value="${manualDraft?.km??''}" required></div><details class="manual-more"><summary>Ajustar tiempo y contexto <span>Opcional</span></summary><div class="manual-extra"><label for="manual-platform">Plataforma</label><select id="manual-platform" name="platform">${['Uber Eats','PedidosYa','Rappi','Otra'].map(p=>`<option ${manualDraft?.platform===p?'selected':''}>${p}</option>`).join('')}</select><label for="manual-restaurant">Restaurante</label><input id="manual-restaurant" name="restaurant" maxlength="60" autocomplete="off" placeholder="Si lo conoces" value="${escapeHtml(manualDraft?.restaurant||'')}"><label for="manual-minutes">Tiempo de viaje <span>min · si no lo sabes, lo estimamos</span></label><input id="manual-minutes" name="minutes" type="number" inputmode="numeric" min="1" max="360" step="1" placeholder="Estimado según distancia" value="${manualDraft?.minutes??''}"><label for="manual-wait">Espera en el local <span>min</span></label><input id="manual-wait" name="waitMin" type="number" inputmode="numeric" min="0" max="180" step="1" placeholder="12 min si no la sabes" value="${manualDraft?.waitMin??''}"><label for="manual-return">Regreso sin pedido <span>km</span></label><input id="manual-return" name="returnKm" type="number" inputmode="decimal" min="0" max="200" step="0.1" placeholder="La mitad de la distancia si no lo sabes" value="${manualDraft?.returnKm??''}"></div></details><button class="btn primary big block manual-submit" type="submit">Calcular cuánto me queda ${icon('arrow','sm')}</button><p class="manual-trust">${icon('shield','sm')}<span>No pedimos tu clave ni tocamos la app de reparto. Nunca aceptamos un pedido por ti.</span></p></form></section><div class="demo-separator"><span>O prueba el recorrido completo</span></div><button class="btn outline block" data-action="simulate">Recibir una oferta de ejemplo</button><p class="note center">Estimación, no ingreso garantizado. La app no lee pedidos reales.</p>`;
     const o = {...(currentOffer || acceptedOffer)};
     for (const key of ['platform','restaurant','from','to']) o[key]=escapeHtml(o[key]);
     const calc = acceptedOffer ? acceptedCalc : calculateOffer(o,vehicle(),state.settings);
@@ -489,11 +497,20 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
       routeStatus=routeData?`${reason} Se conserva la ruta anterior.`:reason;
     } finally {routeLoading=false;render();}
   }
+  function costPerKmCard(v) {
+    const fmt=n=>'$'+new Intl.NumberFormat('es-CL',{minimumFractionDigits:0,maximumFractionDigits:1}).format(Math.round(n*10)/10);
+    const unit=v.type==='electric'?Number(state.settings.kwhPrice):Number(state.settings.fuelPrice);
+    const energy=v.type==='human'?0:(Math.max(0,unit||0)/Math.max(0.001,Number(v.consumption)||1));
+    const maint=Math.max(0,Number(v.maintenance)||0);
+    const row=(label,sub,value,strong)=>`<div class="row"><div class="main"><div class="t1">${label}</div>${sub?`<div class="t2">${sub}</div>`:''}</div><div class="amt${strong?' total':''}">${fmt(value)}<small>/km</small></div></div>`;
+    const energyRow=v.type==='fuel'?row('Bencina',`${fmt(unit)} por litro a ${v.consumption} km/l`,energy):v.type==='electric'?row('Electricidad',`${fmt(unit)} por kWh a ${v.consumption} km/kWh`,energy):'';
+    return `<section class="card cost-km"><p class="kicker">Transparencia</p><h2>Cuánto te cuesta cada km</h2>${energyRow}${row('Mantención','Aceite, neumáticos, cadena y frenos',maint)}${row('Total','',energy+maint,true)}<p class="note cost-km-source">Referencia: investigación del equipo con precios de Chile, noviembre de 2026. Mantención = aceite, neumáticos, cadena y frenos repartidos por km.</p></section>`;
+  }
   function vehiclePage() {
     const v=vehicle(),{investment,net,remaining,progress}=recovery();
     const energyFields=v.type==='fuel'?[['fuelPrice',`Precio de gasolina ${state.settings.fuelGrade}`,'por litro',0,3000,1]]:v.type==='electric'?[['kwhPrice','Precio de electricidad','por kWh',0,3000,1],['batteryKwh','Capacidad de batería','kWh',0,200,0.1],['chargeKw','Potencia real del cargador','kW',0.1,350,0.1],['chargeStart','Carga actual','%',0,100,1],['chargeEnd','Carga deseada','%',0,100,1]]:[];
     const fields=[...energyFields,['dataMonthly','Datos móviles','al mes',0,100000,100],['hoursMonthly','Horas de trabajo','al mes',1,400,1],['goal','Meta neta','por hora',1,100000,100],['investment','Invertido en el vehículo','total',0,100000000,1000]];
-    return `<div><p class="kicker">Tus costos reales</p><h1 class="title" id="page-title" tabindex="-1">Tu vehículo, tus números</h1><p class="lead">Partimos con valores de ejemplo. Ajústalos cuando quieras.</p></div><section class="card"><h2>Vehículo</h2>${vehiclePicker()}<p class="note">Modelos orientativos disponibles en Chile; no representan un ranking de repartidores.</p><p class="note" style="margin-top:10px">${v.type==='human'?'Sin combustible':`${v.consumption} ${v.unit}`} · ${money(v.maintenance)}/km en mantención estimada.</p></section>${v.type==='fuel'?fuelCard():''}<section class="card"><h2>Valores para calcular</h2><div class="fields" style="margin-top:12px">${fields.map(([key,label,suffix,min,max,step])=>`<div class="field"><label for="setting-${key}">${label}</label><div class="input-wrap"><span class="pre" aria-hidden="true">${['hoursMonthly','batteryKwh','chargeKw','chargeStart','chargeEnd'].includes(key)?'':'$'}</span><input id="setting-${key}" type="text" inputmode="${step===0.1?'decimal':'numeric'}" min="${min}" max="${max}" step="${step}" data-setting="${key}" value="${Number(state.settings[key]).toLocaleString('es-CL')}" aria-describedby="hint-${key}"><span class="suf" aria-hidden="true">${suffix}</span></div><p class="hint" id="hint-${key}">Valor editable; se guarda solo aquí.</p></div>`).join('')}</div><p class="note" style="margin-top:14px">Semáforo: verde si llega a tu meta; amarillo entre 90 % y 99 %; rojo bajo 90 %.</p></section>${v.type==='electric'?chargeCard():''}<section class="card"><h2>Inversión</h2><dl class="inv-grid"><div><dt>Invertido</dt><dd>${money(investment)}</dd></div><div><dt>Neto acumulado</dt><dd>${money(net)}</dd></div><div><dt>Por recuperar*</dt><dd>${money(remaining)}</dd></div></dl><div class="progress grow"><span style="width:${progress}%"></span></div><p class="note" style="margin-top:10px">* Comparación ilustrativa, no amortización contable.</p></section><section class="card"><h2>Demostración y seguridad</h2><p class="note">Velocidad simulada: ${state.speed} km/h.</p><div class="btn-col" style="margin-top:12px"><button class="btn outline block" data-action="speed">Probar bloqueo a 15 km/h</button><button class="btn danger block" data-action="reset">Borrar mis datos locales</button></div></section><p class="note center">Sin cuentas en línea. El GPS se usa solo cuando creas una ruta. Los cambios se guardan en este navegador.</p>`;
+    return `<div><p class="kicker">Tus costos reales</p><h1 class="title" id="page-title" tabindex="-1">Tu vehículo, tus números</h1><p class="lead">Partimos con valores de ejemplo. Ajústalos cuando quieras.</p></div><section class="card"><h2>Vehículo</h2>${vehiclePicker()}<p class="note">Modelos orientativos disponibles en Chile; no representan un ranking de repartidores.</p><p class="note" style="margin-top:10px">${v.type==='human'?'Sin combustible':`${v.consumption} ${v.unit}`} · ${money(v.maintenance)}/km en mantención estimada.</p></section>${costPerKmCard(v)}${v.type==='fuel'?fuelCard():''}<section class="card"><h2>Valores para calcular</h2><div class="fields" style="margin-top:12px">${fields.map(([key,label,suffix,min,max,step])=>`<div class="field"><label for="setting-${key}">${label}</label><div class="input-wrap"><span class="pre" aria-hidden="true">${['hoursMonthly','batteryKwh','chargeKw','chargeStart','chargeEnd'].includes(key)?'':'$'}</span><input id="setting-${key}" type="text" inputmode="${step===0.1?'decimal':'numeric'}" min="${min}" max="${max}" step="${step}" data-setting="${key}" value="${Number(state.settings[key]).toLocaleString('es-CL')}" aria-describedby="hint-${key}"><span class="suf" aria-hidden="true">${suffix}</span></div><p class="hint" id="hint-${key}">Valor editable; se guarda solo aquí.</p></div>`).join('')}</div><p class="note" style="margin-top:14px">Semáforo: verde si llega a tu meta; amarillo entre 90 % y 99 %; rojo bajo 90 %.</p></section>${v.type==='electric'?chargeCard():''}<section class="card"><h2>Inversión</h2><dl class="inv-grid"><div><dt>Invertido</dt><dd>${money(investment)}</dd></div><div><dt>Neto acumulado</dt><dd>${money(net)}</dd></div><div><dt>Por recuperar*</dt><dd>${money(remaining)}</dd></div></dl><div class="progress grow"><span style="width:${progress}%"></span></div><p class="note" style="margin-top:10px">* Comparación ilustrativa, no amortización contable.</p></section><section class="card"><h2>Demostración y seguridad</h2><p class="note">Velocidad simulada: ${state.speed} km/h.</p><div class="btn-col" style="margin-top:12px"><button class="btn outline block" data-action="speed">Probar bloqueo a 15 km/h</button><button class="btn danger block" data-action="reset">Borrar mis datos locales</button></div></section><p class="note center">Sin cuentas en línea. El GPS se usa solo cuando creas una ruta. Los cambios se guardan en este navegador.</p>`;
   }
   function refuelPage() {
     if (vehicle().type!=='fuel') return `<div><h1 class="title" id="page-title" tabindex="-1">No necesitas bencina</h1><p class="lead">Tu vehículo usa ${vehicle().type==='electric'?'electricidad':'energía humana'}.</p></div><button class="btn outline block" data-screen="inicio">Volver al inicio</button>`;
@@ -599,7 +616,7 @@ return `<div><p class="kicker">${acceptedOffer?'Pedido aceptado':'Nueva oferta'}
     const restaurant=form.elements.restaurant.value.trim().replace(/\s+/g,' ').slice(0,60);
     const platform=form.elements.platform.value;
     manualDraft={gross,km,platform,restaurant,minutes:minutes??'',waitMin:waitMin??'',returnKm:returnKm??''};
-    const offer={id:`manual-${Date.now()}`,manual:true,platform,gross,km,returnKm:returnKm??0,minutes:minutes??Math.max(5,Math.round(8+km*4.5)),minutesEstimated:minutes===null,waitMin:waitMin??8,waitSource:waitMin===null?'estimada':'manual',from:'Retiro',to:'Entrega',restaurant:restaurant||'Restaurante no indicado'};
+    const offer={id:`manual-${Date.now()}`,manual:true,platform,gross,km,returnKm:returnKm??Math.round(km*5)/10,returnEstimated:returnKm===null,minutes:minutes??Math.max(5,Math.round(8+km*6.25)),minutesEstimated:minutes===null,waitMin:waitMin??12,waitSource:waitMin===null?'estimada':'manual',from:'Retiro',to:'Entrega',restaurant:restaurant||'Restaurante no indicado'};
     currentOffer=waitMin===null&&restaurant?offerWithWait(offer):offer;
     screen='oferta';save();render();
   });
